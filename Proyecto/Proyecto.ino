@@ -1,8 +1,13 @@
 #include "DHT.h"
+#include<SoftwareSerial.h>
 
 // CONSTRUCTOR DEL OBJETO DHT RECIBE EL PIN EN EL QUE SE CONECTA EL SENSOR
 // Y TAMBIEN RECIBE EL TIPO DE SENSOR QUE VAMOS A CONECTAR
 DHT dht(5, DHT11);
+
+//Sender RX and TX pin
+SoftwareSerial s(0,1);
+
 
 const int sensorPin = 0;
 
@@ -116,5 +121,8 @@ void loop() {
   Serial.print("    alcohol:");
   Serial.print(alcohol);
   Serial.println("mg/L");
+
+  //Serial send para NodeMCU
+  s.write(123);
   
 }
