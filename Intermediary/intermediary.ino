@@ -1,12 +1,20 @@
-int data; //Initialized variable to store recieved data
-
+#include <SoftwareSerial.h>
+SoftwareSerial s(D6,D5);
+int data;
 void setup() {
-  //Serial Begin at 9600 Baud 
+  s.begin(9600);
   Serial.begin(9600);
 }
-
+ 
 void loop() {
-  data = Serial.read(); //Read the serial data and store it
-  Serial.println(data);
-  delay(1000);
+  s.write("s");
+  if (s.available()>0){
+    data=s.read();
+    Serial.println(data);
+  }
+  else{
+    Serial.println("Not received");
+  }
+ 
+ 
 }
