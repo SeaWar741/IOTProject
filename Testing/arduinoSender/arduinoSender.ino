@@ -17,12 +17,22 @@ const int zpin = A3; // z-axis
 // lowest and highest sensor readings:
 const int sensorMin = 0;     // sensor minimum
 const int sensorMax = 1024;  // sensor maximum
- 
 
+//luz
 int lightCal;
 int lightVal;
 
+//Gas
 int volumen;
+
+//colores led
+int redPin = 10;
+int greenPin = 9;
+int bluePin = 8;
+
+//potenciometro
+int valueP = 0;
+
 
 void setup() {
   // PREPARAR LA COMUNICACION SERIAL
@@ -32,6 +42,17 @@ void setup() {
   
   // PREPARAR LA LIBRERIA PARA COMUNICARSE CON EL SENSOR
   dht.begin();
+
+  //coloresLed
+  pinMode(redPin, OUTPUT);
+  pinMode(greenPin, OUTPUT);
+  pinMode(bluePin, OUTPUT);
+}
+
+void setColor(int redValue, int greenValue, int blueValue){
+  analogWrite(redPin,redValue);
+  analogWrite(greenPin,greenValue);
+  analogWrite(bluePin,blueValue);
 }
 
 
@@ -125,6 +146,11 @@ void loop() {
   //Serial.print(alcohol);
   //Serial.println("mg/L");
 
+  //Potenciometro
+  valueP = analogRead(7);
+  //Serial.println(valueP);
+   
+  
   //Serial send para NodeMCU
   while(Serial.available()) {
     message = Serial.readString();
@@ -146,6 +172,7 @@ void loop() {
       doc["type"] = "response";
       
       // Get data from  sensors
+      doc["SensorID"] = 1;
       doc["Humedad"] = h;
       doc["Temperatura"] = t;
       doc["Luz"] = lightVal;
@@ -158,10 +185,21 @@ void loop() {
       doc["voltaje"] = voltaje;
       doc["Rs"] = Rs;
       doc["ConcentracionGas"] = alcohol;
+      doc["Potenciometro"] = valueP;
       
       serializeJson(doc,Serial);
     }
     messageReady = false;
   }
+
+  //set colors
+  setColor(255,0,0);//red
+  delay(1000);
+  setColor(0,255,0);//blue
+  delay(1000);
+  setColor(0,0,255);//green
+  delay(1000);
+  setColor(255,255,255);
+  delay(1000);
   
 }
