@@ -58,8 +58,7 @@ void setColor(int redValue, int greenValue, int blueValue){
 
 void loop() {
   // ESPERAR ENTRE MEDICIONES, NECESARIO PARA EL BUEN FUNCIONAMIENTO
-  delay(2000);
-
+  //delay(2000);
 
   //Humedad y temperatura
   lightVal = analogRead(sensorPin);
@@ -84,7 +83,6 @@ void loop() {
   //Serial.print(h);
   //Serial.print(" % ");
   //Serial.print("Temperatura: ");
-  //Serial.print(t);
   //Serial.println(" *C");
   //Serial.print("Luz :");
   //Serial.print(lightVal);
@@ -92,9 +90,9 @@ void loop() {
 
   //Giroscopio
   int x = analogRead(xpin); //read from xpin
-  delay(1); //
+  //delay(1); //
   int y = analogRead(ypin); //read from ypin
-  delay(1); 
+  //delay(1); 
   int z = analogRead(zpin); //read from zpin
 
   float zero_G = 512.0; //ADC is 0~1023 the zero g output equal to Vs/2
@@ -106,8 +104,6 @@ void loop() {
   //Serial.print("\t");
   //Serial.print(((float)z - 340)/68*9.8); //print z value on serial monitor
   //Serial.print("\n");
-
-
 
   
   //Sonido
@@ -169,6 +165,23 @@ void loop() {
       return;
     }
     if(doc["type"] == "request") {
+      if(doc["Led"]==0){
+        setColor(0,0,0);//off
+      }
+      if(doc["Led"]==1){
+        setColor(255,0,0);//red
+      }
+      if(doc["Led"]==2){
+        setColor(0,0,255);//green
+      }
+      if(doc["Led"]==3){
+       setColor(0,255,0);//blue
+      }
+      if(doc["Led"]==4){
+        setColor(255,255,255);//white
+      }
+      
+      //Return Response
       doc["type"] = "response";
       
       // Get data from  sensors
@@ -189,17 +202,14 @@ void loop() {
       
       serializeJson(doc,Serial);
     }
+    
     messageReady = false;
   }
 
   //set colors
-  setColor(255,0,0);//red
-  delay(1000);
-  setColor(0,255,0);//blue
-  delay(1000);
-  setColor(0,0,255);//green
-  delay(1000);
-  setColor(255,255,255);
-  delay(1000);
+  //setColor(255,0,0);//red
+  //setColor(0,255,0);//blue
+  //setColor(0,0,255);//green
+  //setColor(255,255,255);
   
 }
