@@ -61,7 +61,6 @@ void setup(){
 
   //---------------------GPS GET-------------------------------------
   char bssid[6];
-  DynamicJsonDocument root(1024); 
   int n = WiFi.scanNetworks();
   Serial.println("scan done");
   if (n == 0)
@@ -100,11 +99,12 @@ void setup(){
     Serial.println(" ");
   }
   // now build the jsonString...
+  StaticJsonDocument<200> jsonGPS;
   jsonString = "{\n";
-  jsonString += "\"homeMobileCountryCode\": 334,\n"; // this is a real UK MCC
-  jsonString += "\"homeMobileNetworkCode\": 020,\n";  // and a real UK MNC
+  jsonString += "\"homeMobileCountryCode\": 334,\n"; // this is a real MX MCC
+  jsonString += "\"homeMobileNetworkCode\": 20,\n";  // and a real MX MNC
   jsonString += "\"radioType\": \"gsm\",\n";        // for gsm
-  jsonString += "\"carrier\": \"Telcel\",\n";      // associated with Vodafone
+  jsonString += "\"carrier\": \"Telcel\",\n";      // associated with Telcel
   jsonString += "\"wifiAccessPoints\": [\n";
   for (int j = 0; j < n; ++j){
     jsonString += "{\n";
@@ -125,6 +125,8 @@ void setup(){
   }
   jsonString += ("]\n");
   jsonString += ("}\n");
+  
+  Serial.println(jsonString);
   //--------------------------------------------------------------------
 
   Serial.println("");
@@ -156,17 +158,30 @@ void setup(){
   }
 
   //Read and parse all the lines of the reply from server
+  int times = 1;
   while (client.available()) {
     String line = client.readStringUntil('\r');
-    Serial.println(line);
+    Serial.println("INICIA JSON");
     if (more_text) {
       Serial.print(line);
     }
-    latitude    = root["location"]["lat"];
-    longitude   = root["location"]["lng"];
-    accuracy   = root["accuracy"];
+    Serial.println("FIN JSON");
+    
+    DynamicJsonDocument root(1024);
+    auto err1 = deserializeJson(root, line);
+    if(!err1 && times <= 2){
+      Serial.println("LO LOGRO");
+      latitude    = root["location"]["lat"];
+      longitude   = root["location"]["lng"];
+      accuracy   = root["accuracy"];
+      times++;
+    }
   }
-
+  Serial.println("LOCATION");
+  Serial.println(latitude);
+  Serial.println(longitude);
+  Serial.println(accuracy);
+  
   Serial.println("closing connection");
   Serial.println();
   client.stop();
@@ -262,9 +277,10 @@ void loop(){
   Firebase.setDouble(firebaseData, path + "Rs",Rs);
   Firebase.setDouble(firebaseData, path + "Concentracion",concentracion);
   Firebase.setInt(firebaseData, path + "Potenciometro",potenciometro);
-  Firebase.setInt(firebaseData, path + "GPS/Latitude",latitude);
-  Firebase.setInt(firebaseData, path + "GPS/Longitude",longitude);
-  Firebase.setInt(firebaseData, path + "GPS/Longitude",accuracy);
+  
+  Firebase.setDouble(firebaseData, path + "GPS/Latitude",latitude);
+  Firebase.setDouble(firebaseData, path + "GPS/Longitude",longitude);
+  Firebase.setDouble(firebaseData, path + "GPS/Accuracy",accuracy);
   
   //delay(150000);
   
