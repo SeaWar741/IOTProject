@@ -59,7 +59,7 @@ const RightLayout = ({ classes }) => {
         <MapGL
             style={{ width: '100%', minHeight: '100vh' }}
             mapStyle='mapbox://styles/mapbox/light-v9'
-            accessToken="pk.eyJ1Ijoic2Vhd2FyNzQxIiwiYSI6ImNraGE2anR4MDB6b3MycW80NzRwZGVodDYifQ.Ev-c28Y5TOk2-KGu094kSw"
+            accessToken= {process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
             latitude={viewport.latitude}
             longitude={viewport.longitude}
             zoom={viewport.zoom}

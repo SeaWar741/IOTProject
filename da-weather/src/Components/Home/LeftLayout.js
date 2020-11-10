@@ -88,7 +88,7 @@ const LeftLayout = ({ classes }) => {
   //const data = useData();
   
   const [data,setData] = useState({});
-  const [icon,setIcon] = useState("./img/background/Good.jpg");
+  const [icon,setIcon] = useState("./img/iconsWeather/MostlySunny.png");
   const [background,setBackground] = useState("./img/background/Good.jpg");
   
   useEffect (()=>{
@@ -206,7 +206,7 @@ const LeftLayout = ({ classes }) => {
                                 <Card.Title className={classes.cardTitle}>{data.Temperatura}°C</Card.Title>
                                 <div className={classes.relativeTContainer}>
                                     <Card.Text className={classes.relativeT}>
-                                        Feels like: {relativeTemperature}°C
+                                        Sensación térmica: {relativeTemperature}°C
                                     </Card.Text>
                                 </div>
                             </Card.Body>
