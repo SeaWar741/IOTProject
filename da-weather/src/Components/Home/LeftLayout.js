@@ -40,6 +40,7 @@ const useStyles = makeStyles((theme) => ({
     color: "white",
     /* Parent background + Gaussian blur */
     backdropFilter: "blur(10px)",
+    webkitBackdropFilter: "blur(10px)",
   
     /* Exclusion blend */
     backgroundBlendMode: "exclusion",
@@ -81,81 +82,19 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-
-function useData(){
-
-    const [data,setData]= useState({
-        ADC_MQ: null,
-        Concentracion:null,
-        Humedad: null,
-        Lluvia:null,
-        Luz:null,
-        Potenciometro:null,
-        Rs:null,
-        SensorID: null,
-        Sonido:null,
-        Temperatura:null,
-        X:null,
-        Y:null,
-        Z:null,
-        Latitude:null,
-        Longitude:null
-      });
-      
-      useLayoutEffect (()=>{
-        //funcion que llava al montar componente
-        const dataReference = firebase.database().ref(1);
-        
-        const fetchData = async()=>{
-            let datas1 ={};
-            dataReference.on("value",(snapshot)=>{
-                //console.log(snapshot.val().Temperatura);
-                const datas = {
-                    ADC_MQ: snapshot.val().ADC_MQ,
-                    Concentracion: snapshot.val().Concentracion,
-                    Humedad: snapshot.val().Humedad,
-                    Lluvia:snapshot.val().Lluvia,
-                    Luz:snapshot.val().Luz,
-                    Potenciometro:snapshot.val().Potenciometro,
-                    Rs:snapshot.val().Rs,
-                    SensorID: 1,
-                    Sonido:snapshot.val().Sonido,
-                    Temperatura:snapshot.val().Temperatura,
-                    X:snapshot.val().X,
-                    Y:snapshot.val().Y,
-                    Z:snapshot.val().Z,
-                    Latitude: snapshot.val().GPS.Latitude,
-                    Longitude: snapshot.val().GPS.Longitude,
-                };
-                //console.log(datas);
-                datas1 =datas;
-            });
-            console.log(datas1);
-
-            setData(datas1);
-            return()=>{
-                //funcion a llamar cuando desmonte el componente
-                //console.log("Se desmonto el componente");
-            }
-        }
-        fetchData();
-      },[]);  
-      return data;  
-}
-
-
 const LeftLayout = ({ classes }) => {
   classes = useStyles();
 
   //const data = useData();
   
   const [data,setData] = useState({});
+  const [icon,setIcon] = useState("./img/background/Good.jpg");
+  const [background,setBackground] = useState("./img/background/Good.jpg");
   
   useEffect (()=>{
     const dataReference = firebase.database().ref(1);
     
     const fetchData = async()=>{
-        let datas1 ={};
         firebase.database().ref(1).on("value",resp=>{
             //console.log(snapshot.val().Temperatura);
             let datas = {
@@ -175,14 +114,61 @@ const LeftLayout = ({ classes }) => {
                 Latitude: resp.val().GPS.Latitude,
                 Longitude: resp.val().GPS.Longitude,
             };
+
+            
+
+            if(datas.Temperatura >= 25 && datas.Luz <= 5 && datas.Humedad >=40){
+                setIcon("url(./img/iconsWeather/Haze.png");
+                setBackground("./img/background/Rainy.jpg");
+            }
+            else if(datas.Temperatura <= 0 && datas.Humedad >=40 ){
+                setIcon("./img/iconsWeather/Blizzard.png");
+                setBackground("./img/background/Cold.jpg");
+            }
+            else if(datas.Lluvia === "Raining" && datas.Humedad >= 80 && datas.Lluvia === "Raining"){
+                setIcon("./img/iconsWeather/Drizzle.png");
+                setBackground("./img/background/Rainy.jpg");
+            }
+            else if(datas.Luz <= 5 && datas.Humedad >=70 && datas.Lluvia === "Not Raining"){
+                setIcon("./img/iconsWeather/Fog.png");
+                setBackground("./img/background/Rainy.jpg");
+            }
+            else if(datas.Lluvia === "Flood" && datas.X >= 10 && datas.Sonido >=10){
+                setIcon("./img/iconsWeather/SevereThunderstorm.png");
+                setBackground("./img/background/ThunderStorm.jpg");
+            }
+            else if(datas.Lluvia === "Flood" && datas.X >= 10 && datas.Sonido >=10){
+                setIcon("./img/iconsWeather/HeavyRain.png");
+                setBackground("./img/background/TunderStorm.jpg");
+            }
+            else if(datas.Temperatura >=25 && datas.Luz >= 5){
+                setIcon("./img/iconsWeather/MostlySunny.png");
+                setBackground("./img/background/Sunny.jpg");
+            }
+            else if(datas.Luz >=5 && datas.Temperatura >= 20 && datas.Temperatura <=25){
+                setIcon("./img/iconsWeather/MostlySunny.png");
+                setBackground("./img/background/Good.jpg");
+            }
+            else if(datas.Lluvia === "Raining"){
+                setIcon("./img/iconsWeather/Rain.png");
+                setBackground("./img/background/Rainy.jpg");
+            }
+            else{
+                setIcon("./img/iconsWeather/PartyCloudy.png");
+                setBackground("./img/background/Cloudy.jpg");
+            }
+            
             setData(datas);
+
             //console.log(datas);
+            
 
         });
     }
     fetchData();
   },[]);  
 
+  
 
   //Temporal
   let specialSensor =20;
@@ -194,38 +180,10 @@ const LeftLayout = ({ classes }) => {
   var f=new Date();
   let currentDate = diasSemana[f.getDay()] + ", " + f.getDate() + " de " + meses[f.getMonth()] + " de " + f.getFullYear();
   
-  /*
-  function UseiconWeather(){
-    if(temperature >= 25 && light <= 5 && humidity >=40){
-        return ("./img/iconsWeather/Haze.png");
-    }
-    if(temperature <= 0 && humidity >=40 ){
-        return("./img/iconsWeather/Blizzard.png");
-    }
-    if(rain === "Raining" && humidity >= 80){
-        return("./img/iconsWeather/Drizzle.png");
-    }
-    if(light <= 5 && humidity >=40 && rain === "Not Raining"){
-        return("./img/iconsWeather/Fog.png");
-    }
-    if(rain === "Flood" && wind >= 10 && sound >=20){
-        return("./img/iconsWeather/SevereThunderstorm.png");
-    }
-    if(rain === "Raining" && wind >= 10 && sound >=20){
-        return("./img/iconsWeather/HeavyRain.png");
-    }
-    if(temperature >=25 && light >= 5){
-        return("./img/iconsWeather/MostlySunny.png");
-    }
-    else{
-        return("./img/iconsWeather/PartyCloudy.png");
-    }
-  }
-  */
-  
+  console.log("url('"+icon+"')");
     
   return (
-        <div className={classes.Main}>
+        <div className={classes.Main}   style={{backgroundImage :"url('"+background+"')"}}>
             <div className={classes.imageTopContainer}>
                 <Image src="./img/DaWeather.png" className={classes.imageTop} fluid/>
             </div>
@@ -233,7 +191,6 @@ const LeftLayout = ({ classes }) => {
                 <Grid container spacing={3}>
                     <Grid item xs={6}>
                         <Paper className={classes.paper}>
-                            
                             <p className={classes.headerText}><LocationMarker size="40"/> {location}</p>
                         </Paper>
                     </Grid>
@@ -244,7 +201,7 @@ const LeftLayout = ({ classes }) => {
                     </Grid>
                     <Grid item xs={6}>
                         <Paper className={classes.paper}>
-                            <Image src="./img/iconsWeather/MostlySunny.png" className={classes.iconWeather} fluid/>
+                            <Image src={icon} className={classes.iconWeather} fluid/>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitle}>{data.Temperatura}°C</Card.Title>
                                 <div className={classes.relativeTContainer}>
