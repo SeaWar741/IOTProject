@@ -8,6 +8,7 @@ import {Calendar} from '@styled-icons/boxicons-regular/Calendar';
 import firebase from '../../Utils/Firebase';
 
 import "bootstrap/dist/css/bootstrap.min.css";
+import { RestorePage } from "styled-icons/material-sharp";
 
 const useStyles = makeStyles((theme) => ({
   Main:{
@@ -104,36 +105,40 @@ function useData(){
       useLayoutEffect (()=>{
         //funcion que llava al montar componente
         const dataReference = firebase.database().ref(1);
-        let datas1 ={};
-        dataReference.on("value",(snapshot)=>{
-            //console.log(snapshot.val().Temperatura);
-            const datas = {
-                ADC_MQ: snapshot.val().ADC_MQ,
-                Concentracion: snapshot.val().Concentracion,
-                Humedad: snapshot.val().Humedad,
-                Lluvia:snapshot.val().Lluvia,
-                Luz:snapshot.val().Luz,
-                Potenciometro:snapshot.val().Potenciometro,
-                Rs:snapshot.val().Rs,
-                SensorID: 1,
-                Sonido:snapshot.val().Sonido,
-                Temperatura:snapshot.val().Temperatura,
-                X:snapshot.val().X,
-                Y:snapshot.val().Y,
-                Z:snapshot.val().Z,
-                Latitude: snapshot.val().GPS.Latitude,
-                Longitude: snapshot.val().GPS.Longitude,
-            };
-            console.log(datas);
-            datas1 =datas;
-        });
-        console.log(datas1);
+        
+        const fetchData = async()=>{
+            let datas1 ={};
+            dataReference.on("value",(snapshot)=>{
+                //console.log(snapshot.val().Temperatura);
+                const datas = {
+                    ADC_MQ: snapshot.val().ADC_MQ,
+                    Concentracion: snapshot.val().Concentracion,
+                    Humedad: snapshot.val().Humedad,
+                    Lluvia:snapshot.val().Lluvia,
+                    Luz:snapshot.val().Luz,
+                    Potenciometro:snapshot.val().Potenciometro,
+                    Rs:snapshot.val().Rs,
+                    SensorID: 1,
+                    Sonido:snapshot.val().Sonido,
+                    Temperatura:snapshot.val().Temperatura,
+                    X:snapshot.val().X,
+                    Y:snapshot.val().Y,
+                    Z:snapshot.val().Z,
+                    Latitude: snapshot.val().GPS.Latitude,
+                    Longitude: snapshot.val().GPS.Longitude,
+                };
+                //console.log(datas);
+                datas1 =datas;
+            });
+            console.log(datas1);
 
-        setData(datas1);
-        return()=>{
-            //funcion a llamar cuando desmonte el componente
-            //console.log("Se desmonto el componente");
+            setData(datas1);
+            return()=>{
+                //funcion a llamar cuando desmonte el componente
+                //console.log("Se desmonto el componente");
+            }
         }
+        fetchData();
       },[]);  
       return data;  
 }
@@ -142,8 +147,42 @@ function useData(){
 const LeftLayout = ({ classes }) => {
   classes = useStyles();
 
-  const data = useData();
+  //const data = useData();
   
+  const [data,setData] = useState({});
+  
+  useEffect (()=>{
+    const dataReference = firebase.database().ref(1);
+    
+    const fetchData = async()=>{
+        let datas1 ={};
+        firebase.database().ref(1).on("value",resp=>{
+            //console.log(snapshot.val().Temperatura);
+            let datas = {
+                ADC_MQ: resp.val().ADC_MQ,
+                Concentracion: resp.val().Concentracion,
+                Humedad: resp.val().Humedad,
+                Lluvia:resp.val().Lluvia,
+                Luz:resp.val().Luz,
+                Potenciometro:resp.val().Potenciometro,
+                Rs:resp.val().Rs,
+                SensorID: 1,
+                Sonido:resp.val().Sonido,
+                Temperatura:resp.val().Temperatura,
+                X:resp.val().X,
+                Y:resp.val().Y,
+                Z:resp.val().Z,
+                Latitude: resp.val().GPS.Latitude,
+                Longitude: resp.val().GPS.Longitude,
+            };
+            setData(datas);
+            //console.log(datas);
+
+        });
+    }
+    fetchData();
+  },[]);  
+
 
   //Temporal
   let specialSensor =20;
