@@ -115,52 +115,52 @@ const LeftLayout = ({ classes }) => {
                 Longitude: resp.val().GPS.Longitude,
             };
 
+            const hours = new Date().getHours();
+            const isDayTime = hours > 6 && hours < 20;
             
 
             if(datas.Temperatura >= 25 && datas.Luz <= 5 && datas.Humedad >=40){
                 setIcon("url(./img/iconsWeather/Haze.png");
-                setBackground("./img/background/Rainy.jpg");
+                isDayTime ? setBackground("./img/background/Rainy.jpg") : setBackground("./img/background/Night.jpg");
             }
             else if(datas.Temperatura <= 0 && datas.Humedad >=40 ){
                 setIcon("./img/iconsWeather/Blizzard.png");
-                setBackground("./img/background/Cold.jpg");
+                isDayTime ? setBackground("./img/background/Cold.jpg") : setBackground("./img/background/Night.jpg");
             }
             else if(datas.Lluvia === "Raining" && datas.Humedad >= 80 && datas.Lluvia === "Raining"){
                 setIcon("./img/iconsWeather/Drizzle.png");
-                setBackground("./img/background/Rainy.jpg");
+                isDayTime ? setBackground("./img/background/Rainy.jpg") : setBackground("./img/background/Night.jpg");
             }
             else if(datas.Luz <= 5 && datas.Humedad >=70 && datas.Lluvia === "Not Raining"){
                 setIcon("./img/iconsWeather/Fog.png");
-                setBackground("./img/background/Rainy.jpg");
+                isDayTime ? setBackground("./img/background/Rainy.jpg") : setBackground("./img/background/Night.jpg");
             }
             else if(datas.Lluvia === "Flood" && datas.X >= 10 && datas.Sonido >=10){
                 setIcon("./img/iconsWeather/SevereThunderstorm.png");
-                setBackground("./img/background/ThunderStorm.jpg");
+                isDayTime ? setBackground("./img/background/ThunderStorm.jpg") : setBackground("./img/background/Night.jpg");
             }
             else if(datas.Lluvia === "Flood" && datas.X >= 10 && datas.Sonido >=10){
                 setIcon("./img/iconsWeather/HeavyRain.png");
-                setBackground("./img/background/TunderStorm.jpg");
+                isDayTime ? setBackground("./img/background/TunderStorm.jpg") : setBackground("./img/background/Night.jpg");
             }
             else if(datas.Temperatura >=25 && datas.Luz >= 5){
                 setIcon("./img/iconsWeather/MostlySunny.png");
-                setBackground("./img/background/Sunny.jpg");
+                isDayTime ? setBackground("./img/background/Sunny.jpg") : setBackground("./img/background/Night.jpg");
             }
             else if(datas.Luz >=5 && datas.Temperatura >= 20 && datas.Temperatura <=25){
                 setIcon("./img/iconsWeather/MostlySunny.png");
-                setBackground("./img/background/Good.jpg");
+                isDayTime ? setBackground("./img/background/Good.jpg") : setBackground("./img/background/Night.jpg");
             }
             else if(datas.Lluvia === "Raining"){
                 setIcon("./img/iconsWeather/Rain.png");
-                setBackground("./img/background/Rainy.jpg");
+                isDayTime ? setBackground("./img/background/Rainy.jpg") : setBackground("./img/background/Night.jpg");
             }
             else{
                 setIcon("./img/iconsWeather/PartyCloudy.png");
-                setBackground("./img/background/Cloudy.jpg");
+                isDayTime ? setBackground("./img/background/Cloudy.jpg") : setBackground("./img/background/Night.jpg");
             }
             
             setData(datas);
-
-            //console.log(datas);
             
 
         });
