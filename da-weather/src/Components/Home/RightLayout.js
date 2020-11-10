@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import {Container,Row,Col,Image } from 'react-bootstrap'
+import {Image } from 'react-bootstrap'
 
 import MapGL, { GeolocateControl,NavigationControl,Marker  } from '@urbica/react-map-gl';
 
@@ -35,18 +35,6 @@ const RightLayout = ({ classes }) => {
     longitude: -100.286697388,
     latitude: 25.63986969
   });
-
-  const style = {
-    padding: '10px',
-    color: '#fff',
-    cursor: 'pointer',
-    background: '#1978c8',
-    borderRadius: '6px'
-  };
-  
-  const onMapClick = (event) => {
-    setPosition({ longitude: event.lngLat.lng, latitude: event.lngLat.lat });
-  };
   
   const onMarkerClick = (event) => {
     alert('You clicked on a station');
