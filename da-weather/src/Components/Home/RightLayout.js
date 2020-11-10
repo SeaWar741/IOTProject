@@ -4,6 +4,7 @@ import {Container,Row,Col,Image } from 'react-bootstrap'
 
 import MapGL, { GeolocateControl,NavigationControl,Marker  } from '@urbica/react-map-gl';
 
+
 import 'mapbox-gl/dist/mapbox-gl.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 

@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.11.0",
+    "@react-firebase/database": "^0.3.11",
     "@tensorflow/tfjs": "^2.7.0",
     "@testing-library/jest-dom": "^5.11.5",
     "@testing-library/react": "^11.1.1",
@@ -15,6 +16,7 @@
     "react": "^17.0.1",
     "react-bootstrap": "^1.4.0",
     "react-dom": "^17.0.1",
+    "react-firebase-hooks": "^2.2.0",
     "react-mapbox-gl": "^5.0.0",
     "react-scripts": "4.0.0",
     "recharts": "^1.8.5",
