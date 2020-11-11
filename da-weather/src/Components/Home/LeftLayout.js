@@ -91,13 +91,13 @@ const LeftLayout = ({ classes }) => {
   const [data,setData] = useState({});
   const [icon,setIcon] = useState("./img/iconsWeather/MostlySunny.png");
   const [background,setBackground] = useState("./img/background/Good.jpg");
-  const [cityLocation, setCityLocation] = useState("Monterrey, Mx");
-  
+  const [cityLocation, setCityLocation] = useState("");
+  const [dataStatus, setDataStatus] = useState(false);
   
   useEffect (()=>{
     const dataReference = firebase.database().ref(1);
     
-    const fetchData = async()=>{
+    async function fetchData(){
         firebase.database().ref(1).on("value",resp=>{
             //console.log(snapshot.val().Temperatura);
             let datas = {
@@ -121,10 +121,10 @@ const LeftLayout = ({ classes }) => {
             const hours = new Date().getHours();
             const isDayTime = hours > 6 && hours < 20;
 
-            //const fetchUrl = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+datas.Latitude+","+datas.Longitude+"&key="+process.env.REACT_APP_APIKEY_GEOCODING;
-            //const newRequest = await axios.get(fetchUrl);
-            //console.log(newRequest);
-            //setCityLocation(newRequest.data.results);
+            /* const fetchUrl = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+datas.Latitude+","+datas.Longitude+"&key="+process.env.REACT_APP_APIKEY_GEOCODING;
+            const newRequest = await axios.get(fetchUrl);
+            console.log(newRequest);
+            setCityLocation(newRequest.data.results); */
             
 
             if(datas.Temperatura >= 25 && datas.Luz <= 5 && datas.Humedad >=40){
@@ -169,12 +169,16 @@ const LeftLayout = ({ classes }) => {
             }
             
             setData(datas);
-            
+            setDataStatus(true);
 
         });
+        if(dataStatus){
+            const newRequest = await axios.get("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + data.Latitude +  "," + data.Longitude + "&key=" + process.env.REACT_APP_APIKEY_GEOCODING);
+            setCityLocation(newRequest.data.results[4].formatted_address);
+        }
     }
     fetchData();
-  },[]);  
+  },[dataStatus]);  
 
   
 
@@ -185,7 +189,7 @@ const LeftLayout = ({ classes }) => {
 
   var meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   var diasSemana = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
-  var f=new Date();
+  var f = new Date();
   let currentDate = diasSemana[f.getDay()] + ", " + f.getDate() + " de " + meses[f.getMonth()] + " de " + f.getFullYear();
   
   console.log("url('"+icon+"')");

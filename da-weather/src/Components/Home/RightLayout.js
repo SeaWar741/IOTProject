@@ -33,7 +33,7 @@ const RightLayout = ({ classes }) => {
     const dataReference = firebase.database();
 
     let dataArry = [];
-    console.log("dataArry: ", dataArry);
+    //console.log("dataArry: ", dataArry);
     /* const fetchData = () =>{
       for (var i = 1; i <= 2; i++) {
         firebase.database().ref(i).on("value",resp=>{
@@ -63,17 +63,17 @@ const RightLayout = ({ classes }) => {
     } */
 
     async function fetchData(){
-      console.log("fetching  data..");
+      //console.log("fetching  data..");
       for (var i = 1; i <= 2; i++) {
 
         const locations = await firebase.database().ref(i)
-        console.log("locations",locations);
+        //console.log("locations",locations);
         locations.on("value", resp => {
           let datas = {
             Latitude: resp.val().GPS.Latitude,
             Longitude: resp.val().GPS.Longitude,
           };
-          console.log("datas",datas);
+          //console.log("datas",datas);
           dataArry.push(datas);
           setMarkersStatus(true);
         })
@@ -81,9 +81,9 @@ const RightLayout = ({ classes }) => {
 
       let markerLists = [];
       if(markersStatus){
-        console.log("dataArry 2: ", dataArry);
+        //console.log("dataArry 2: ", dataArry);
         dataArry.forEach((marker,index)=>{
-          console.log("marker: ", marker);
+          //console.log("marker: ", marker);
           markerLists.push( 
             <Marker key={index+1}
               longitude={marker.Longitude}
