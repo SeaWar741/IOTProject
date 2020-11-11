@@ -5,6 +5,7 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import {LocationMarker} from '@styled-icons/heroicons-solid/LocationMarker';
 import {Calendar} from '@styled-icons/boxicons-regular/Calendar';
+import axios from "axios";
 import firebase from '../../Utils/Firebase';
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -13,6 +14,7 @@ const useStyles = makeStyles((theme) => ({
   Main:{
     backgroundColor:"#264057",
     backgroundImage:"url('./img/background/Good.jpg')",
+    
     backgroundRepeat:"no-repeat",
     backgroundPosition:"center",
 
@@ -76,7 +78,7 @@ const useStyles = makeStyles((theme) => ({
   },
   headerText:{
       fontWeight:"bold",
-      fontSize:"20px"
+      fontSize:"18px"
   }
 }));
 
@@ -89,6 +91,8 @@ const LeftLayout = ({ classes }) => {
   const [data,setData] = useState({});
   const [icon,setIcon] = useState("./img/iconsWeather/MostlySunny.png");
   const [background,setBackground] = useState("./img/background/Good.jpg");
+  const [cityLocation, setCityLocation] = useState("Monterrey, Mx");
+  
   
   useEffect (()=>{
     const dataReference = firebase.database().ref(1);
@@ -116,11 +120,16 @@ const LeftLayout = ({ classes }) => {
 
             const hours = new Date().getHours();
             const isDayTime = hours > 6 && hours < 20;
+
+            //const fetchUrl = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+datas.Latitude+","+datas.Longitude+"&key="+process.env.REACT_APP_APIKEY_GEOCODING;
+            //const newRequest = await axios.get(fetchUrl);
+            //console.log(newRequest);
+            //setCityLocation(newRequest.data.results);
             
 
             if(datas.Temperatura >= 25 && datas.Luz <= 5 && datas.Humedad >=40){
-                setIcon("url(./img/iconsWeather/Haze.png");
-                isDayTime ? setBackground("./img/background/Rainy.jpg") : setBackground("./img/background/Night.jpg");
+                setIcon("./img/iconsWeather/Haze.png");
+                isDayTime ? setBackground("./img/background/Cloudy.jpg") : setBackground("./img/background/Night.jpg");
             }
             else if(datas.Temperatura <= 0 && datas.Humedad >=40 ){
                 setIcon("./img/iconsWeather/Blizzard.png");
@@ -172,7 +181,7 @@ const LeftLayout = ({ classes }) => {
   //Temporal
   let specialSensor =20;
   let relativeTemperature = data.Temperatura+2;
-  let location = "Monterrey, Mx"
+  let location = "Monterrey, Mx";
 
   var meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   var diasSemana = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
@@ -190,7 +199,7 @@ const LeftLayout = ({ classes }) => {
                 <Grid container spacing={3}>
                     <Grid item xs={6}>
                         <Paper className={classes.paper}>
-                            <p className={classes.headerText}><LocationMarker size="40"/> {location}</p>
+                            <p className={classes.headerText}><LocationMarker size="40"/> {cityLocation}</p>
                         </Paper>
                     </Grid>
                     <Grid item xs={6}>
