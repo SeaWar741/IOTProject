@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import {Container,Row,Col,Image,Card } from 'react-bootstrap'
+import {Image,Card } from 'react-bootstrap'
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import {LocationMarker} from '@styled-icons/heroicons-solid/LocationMarker';
 import {Calendar} from '@styled-icons/boxicons-regular/Calendar';
-
+import firebase from '../../Utils/Firebase';
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -18,6 +18,7 @@ const useStyles = makeStyles((theme) => ({
 
     width:"100%",
     minHeight:"100vh",
+    maxHeight:"100vh",
     color:"white"
   },
   imageTopContainer:{
@@ -38,6 +39,7 @@ const useStyles = makeStyles((theme) => ({
     color: "white",
     /* Parent background + Gaussian blur */
     backdropFilter: "blur(10px)",
+    webkitBackdropFilter: "blur(10px)",
   
     /* Exclusion blend */
     backgroundBlendMode: "exclusion",
@@ -74,153 +76,237 @@ const useStyles = makeStyles((theme) => ({
   },
   headerText:{
       fontWeight:"bold",
-      fontSize:"24px"
+      fontSize:"20px"
   }
 }));
+
 
 const LeftLayout = ({ classes }) => {
   classes = useStyles();
 
-  let temperature = 30;
-  let relativeTemperature = 35;
-  let specialSensor = "80 vehiculos";
-  let location = "San Pedro Garza García, MX";
-  let idStation = 1;
-  let light = 7;
+  //const data = useData();
+  
+  const [data,setData] = useState({});
+  const [icon,setIcon] = useState("./img/iconsWeather/MostlySunny.png");
+  const [background,setBackground] = useState("./img/background/Good.jpg");
+  
+  useEffect (()=>{
+    const dataReference = firebase.database().ref(1);
+    
+    const fetchData = async()=>{
+        firebase.database().ref(1).on("value",resp=>{
+            //console.log(snapshot.val().Temperatura);
+            let datas = {
+                ADC_MQ: resp.val().ADC_MQ,
+                Concentracion: resp.val().Concentracion,
+                Humedad: resp.val().Humedad,
+                Lluvia:resp.val().Lluvia,
+                Luz:resp.val().Luz,
+                Potenciometro:resp.val().Potenciometro,
+                Rs:resp.val().Rs,
+                SensorID: 1,
+                Sonido:resp.val().Sonido,
+                Temperatura:resp.val().Temperatura,
+                X:resp.val().X,
+                Y:resp.val().Y,
+                Z:resp.val().Z,
+                Latitude: resp.val().GPS.Latitude,
+                Longitude: resp.val().GPS.Longitude,
+            };
+
+            const hours = new Date().getHours();
+            const isDayTime = hours > 6 && hours < 20;
+            
+
+            if(datas.Temperatura >= 25 && datas.Luz <= 5 && datas.Humedad >=40){
+                setIcon("url(./img/iconsWeather/Haze.png");
+                isDayTime ? setBackground("./img/background/Rainy.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            else if(datas.Temperatura <= 0 && datas.Humedad >=40 ){
+                setIcon("./img/iconsWeather/Blizzard.png");
+                isDayTime ? setBackground("./img/background/Cold.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            else if(datas.Lluvia === "Raining" && datas.Humedad >= 80 && datas.Lluvia === "Raining"){
+                setIcon("./img/iconsWeather/Drizzle.png");
+                isDayTime ? setBackground("./img/background/Rainy.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            else if(datas.Luz <= 5 && datas.Humedad >=70 && datas.Lluvia === "Not Raining"){
+                setIcon("./img/iconsWeather/Fog.png");
+                isDayTime ? setBackground("./img/background/Rainy.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            else if(datas.Lluvia === "Flood" && datas.X >= 10 && datas.Sonido >=10){
+                setIcon("./img/iconsWeather/SevereThunderstorm.png");
+                isDayTime ? setBackground("./img/background/ThunderStorm.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            else if(datas.Lluvia === "Flood" && datas.X >= 10 && datas.Sonido >=10){
+                setIcon("./img/iconsWeather/HeavyRain.png");
+                isDayTime ? setBackground("./img/background/TunderStorm.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            else if(datas.Temperatura >=25 && datas.Luz >= 5){
+                setIcon("./img/iconsWeather/MostlySunny.png");
+                isDayTime ? setBackground("./img/background/Sunny.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            else if(datas.Luz >=5 && datas.Temperatura >= 20 && datas.Temperatura <=25){
+                setIcon("./img/iconsWeather/MostlySunny.png");
+                isDayTime ? setBackground("./img/background/Good.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            else if(datas.Lluvia === "Raining"){
+                setIcon("./img/iconsWeather/Rain.png");
+                isDayTime ? setBackground("./img/background/Rainy.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            else{
+                setIcon("./img/iconsWeather/PartyCloudy.png");
+                isDayTime ? setBackground("./img/background/Cloudy.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            
+            setData(datas);
+            
+
+        });
+    }
+    fetchData();
+  },[]);  
+
   
 
-  var meses = new Array ("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
-  var diasSemana = new Array("Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado");
+  //Temporal
+  let specialSensor =20;
+  let relativeTemperature = data.Temperatura+2;
+  let location = "Monterrey, Mx"
+
+  var meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  var diasSemana = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
   var f=new Date();
   let currentDate = diasSemana[f.getDay()] + ", " + f.getDate() + " de " + meses[f.getMonth()] + " de " + f.getFullYear();
-
+  
+  console.log("url('"+icon+"')");
+    
   return (
-    <div className={classes.Main}>
-        <div className={classes.imageTopContainer}>
-            <Image src="./img/DaWeather.png" className={classes.imageTop} fluid/>
-        </div>
-        <div className={classes.cardContainer}>
-            <Grid container spacing={3}>
-                <Grid item xs={6}>
-                    <Paper className={classes.paper}>
-                        
-                        <p className={classes.headerText}><LocationMarker size="40"/> {location}</p>
-                    </Paper>
-                </Grid>
-                <Grid item xs={6}>
-                    <Paper className={classes.paper}>
-                        <p className={classes.headerText}><Calendar size="40"/> {currentDate}</p>
-                    </Paper>
-                </Grid>
-                <Grid item xs={6}>
-                    <Paper className={classes.paper}>
-                        <Image src="./img/iconsWeather/sun.png" className={classes.iconWeather} fluid/>
-                        <Card.Body className={classes.cardBody}>
-                            <Card.Title className={classes.cardTitle}>{temperature}°C</Card.Title>
-                            <div className={classes.relativeTContainer}>
-                                <Card.Text className={classes.relativeT}>
-                                    Feels like: {relativeTemperature}°C
+        <div className={classes.Main}   style={{backgroundImage :"url('"+background+"')"}}>
+            <div className={classes.imageTopContainer}>
+                <Image src="./img/DaWeather.png" className={classes.imageTop} fluid/>
+            </div>
+            <div className={classes.cardContainer}>
+                <Grid container spacing={3}>
+                    <Grid item xs={6}>
+                        <Paper className={classes.paper}>
+                            <p className={classes.headerText}><LocationMarker size="40"/> {location}</p>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Paper className={classes.paper}>
+                            <p className={classes.headerText}><Calendar size="40"/> {currentDate}</p>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Paper className={classes.paper}>
+                            <Image src={icon} className={classes.iconWeather} fluid/>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitle}>{data.Temperatura}°C</Card.Title>
+                                <div className={classes.relativeTContainer}>
+                                    <Card.Text className={classes.relativeT}>
+                                        Sensación térmica: {relativeTemperature}°C
+                                    </Card.Text>
+                                </div>
+                            </Card.Body>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Paper className={classes.paper}>
+                            <Image src="./img/iconsWeather/generic.png" className={classes.iconWeather} fluid/>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitle}>{specialSensor} Autos</Card.Title>
+                                <div className={classes.relativeTContainer}>
+                                    <Card.Text className={classes.relativeT}>
+                                        ID Estación: {data.SensorID}
+                                    </Card.Text>
+                                </div>
+                            </Card.Body>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <Paper className={classes.paper}>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitleMini}>Humedad</Card.Title>
+                                <Card.Text>
+                                    {data.Humedad}
                                 </Card.Text>
-                            </div>
-                        </Card.Body>
-                    </Paper>
-                </Grid>
-                <Grid item xs={6}>
-                    <Paper className={classes.paper}>
-                        <Image src="./img/iconsWeather/generic.png" className={classes.iconWeather} fluid/>
-                        <Card.Body className={classes.cardBody}>
-                            <Card.Title className={classes.cardTitle}>{specialSensor}</Card.Title>
-                            <div className={classes.relativeTContainer}>
-                                <Card.Text className={classes.relativeT}>
-                                    ID Estación: {idStation}
+                            </Card.Body>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <Paper className={classes.paper}>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitleMini}>Luz</Card.Title>
+                                <Card.Text>
+                                    {data.Luz}
                                 </Card.Text>
-                            </div>
-                        </Card.Body>
-                    </Paper>
+                            </Card.Body>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <Paper className={classes.paper}>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitleMini}>Sonido</Card.Title>
+                                <Card.Text>
+                                    {data.Sonido}
+                                </Card.Text>
+                            </Card.Body>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <Paper className={classes.paper}>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitleMini}>Temperatura</Card.Title>
+                                <Card.Text>
+                                    {data.Temperatura}
+                                </Card.Text>
+                            </Card.Body>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <Paper className={classes.paper}>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitleMini}>CO2</Card.Title>
+                                <Card.Text>
+                                    {data.Concentracion}
+                                </Card.Text>
+                            </Card.Body>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <Paper className={classes.paper}>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitleMini}>Lluvia</Card.Title>
+                                <Card.Text>
+                                    {data.Lluvia}
+                                </Card.Text>
+                            </Card.Body>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <Paper className={classes.paper}>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitleMini}>Viento</Card.Title>
+                                <Card.Text>
+                                    {data.X}
+                                </Card.Text>
+                            </Card.Body>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <Paper className={classes.paper}>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitleMini}>RS</Card.Title>
+                                <Card.Text>
+                                    {data.Rs}
+                                </Card.Text>
+                            </Card.Body>
+                        </Paper>
+                    </Grid>
                 </Grid>
-                <Grid item xs={3}>
-                    <Paper className={classes.paper}>
-                        <Card.Body className={classes.cardBody}>
-                            <Card.Title className={classes.cardTitleMini}>Humedad</Card.Title>
-                            <Card.Text>
-                                {temperature}
-                            </Card.Text>
-                        </Card.Body>
-                    </Paper>
-                </Grid>
-                <Grid item xs={3}>
-                    <Paper className={classes.paper}>
-                        <Card.Body className={classes.cardBody}>
-                            <Card.Title className={classes.cardTitleMini}>Luz</Card.Title>
-                            <Card.Text>
-                                {temperature}
-                            </Card.Text>
-                        </Card.Body>
-                    </Paper>
-                </Grid>
-                <Grid item xs={3}>
-                    <Paper className={classes.paper}>
-                        <Card.Body className={classes.cardBody}>
-                            <Card.Title className={classes.cardTitleMini}>Sonido</Card.Title>
-                            <Card.Text>
-                                {temperature}
-                            </Card.Text>
-                        </Card.Body>
-                    </Paper>
-                </Grid>
-                <Grid item xs={3}>
-                    <Paper className={classes.paper}>
-                        <Card.Body className={classes.cardBody}>
-                            <Card.Title className={classes.cardTitleMini}>Temperatura</Card.Title>
-                            <Card.Text>
-                                {temperature}
-                            </Card.Text>
-                        </Card.Body>
-                    </Paper>
-                </Grid>
-                <Grid item xs={3}>
-                    <Paper className={classes.paper}>
-                        <Card.Body className={classes.cardBody}>
-                            <Card.Title className={classes.cardTitleMini}>Concentración CO2</Card.Title>
-                            <Card.Text>
-                                {temperature}
-                            </Card.Text>
-                        </Card.Body>
-                    </Paper>
-                </Grid>
-                <Grid item xs={3}>
-                    <Paper className={classes.paper}>
-                        <Card.Body className={classes.cardBody}>
-                            <Card.Title className={classes.cardTitleMini}>Lluvia</Card.Title>
-                            <Card.Text>
-                                {temperature}
-                            </Card.Text>
-                        </Card.Body>
-                    </Paper>
-                </Grid>
-                <Grid item xs={3}>
-                    <Paper className={classes.paper}>
-                        <Card.Body className={classes.cardBody}>
-                            <Card.Title className={classes.cardTitleMini}>Viento</Card.Title>
-                            <Card.Text>
-                                {temperature}
-                            </Card.Text>
-                        </Card.Body>
-                    </Paper>
-                </Grid>
-                <Grid item xs={3}>
-                    <Paper className={classes.paper}>
-                        <Card.Body className={classes.cardBody}>
-                            <Card.Title className={classes.cardTitleMini}>RS</Card.Title>
-                            <Card.Text>
-                                {temperature}
-                            </Card.Text>
-                        </Card.Body>
-                    </Paper>
-                </Grid>
-            </Grid>
+            </div>
         </div>
-    </div>
   );
 };
 
