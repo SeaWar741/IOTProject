@@ -10,6 +10,7 @@
     "@testing-library/react": "^11.1.1",
     "@testing-library/user-event": "^12.2.0",
     "@urbica/react-map-gl": "^1.14.2",
+    "axios": "^0.21.0",
     "bootstrap": "^4.5.3",
     "firebase": "^8.0.1",
     "mapbox-gl": "^1.12.0",
