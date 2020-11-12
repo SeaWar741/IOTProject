@@ -8,8 +8,8 @@
 String message = "";//json
 bool messageReady = false;
 
-const int IDSensor = 1; //<--Cambiar por el ID correspondiente
-const String specialSensorTitle = ""; //Nombre del sensor o medicion a realizar
+const int IDSensor = 3; //<--Cambiar por el ID correspondiente
+const String specialSensorTitle = "Fuego"; //Nombre del sensor o medicion a realizar
 
 // CONSTRUCTOR DEL OBJETO DHT RECIBE EL PIN EN EL QUE SE CONECTA EL SENSOR
 // Y TAMBIEN RECIBE EL TIPO DE SENSOR QUE VAMOS A CONECTAR
@@ -44,7 +44,7 @@ int yP = 0;
 
 //AQUI COLOCAR PIN DEL SENSOR ESPECIAL DE LA ESTACION formato -> (medicion)Sensor
 //ejemplo: 
-//const int fuegoSensor = A8;
+const int fuegoSensor = A8;
 //const int fuegoSensor = 9; //<-para digitales
 
 //AQUI COLOCAR PIN DEL ACTUADOR ESPECIAL DE LA ESTACION formato -> especial(actuador)
@@ -188,7 +188,7 @@ void loop() {
 
   //SENSOR ESPECIAL
   //Poner aqui el nombre de la variable y la lectura
-  float specialSensorReading = 0;
+  float specialSensorReading = analogRead(A8);
 
 
   //SERIAL VERIFICATION
@@ -212,7 +212,7 @@ void loop() {
     }
 
     if(doc["type"] == "request") {
-
+/*
       if(doc["L"]==0){
         setColor(0,0,0);//off
       }
@@ -220,16 +220,21 @@ void loop() {
         setColor(255,0,0);//red
       }
       if(doc["L"]==2){
-        setColor(0,0,255);//green
+        setColor(0,0,255);//blue
       }
       if(doc["L"]==3){
-       setColor(0,255,0);//blue
+       setColor(0,255,0);//green
       }
       if(doc["L"]==4){
         setColor(255,255,255);//white
       }
-
+*/
       //Aqui trabajar el actuador extra de cada uno
+      if (specialSensorReading < 700){
+        setColor(255,0,0);
+      }else{
+        setColor(0,0,255);
+        }
       /*
        * ejemplo
        * if(doc[E]>30){ <-- El doc[extra] funciona como input remoto
