@@ -109,12 +109,14 @@ const LeftLayout = ({ classes }) => {
                 Luz:resp.val().Luz,
                 Potenciometro:resp.val().Potenciometro,
                 Rs:resp.val().Rs,
-                SensorID: 1,
+                SensorID: resp.val().SensorID,
                 Sonido:resp.val().Sonido,
                 Temperatura:resp.val().Temperatura,
+                TemperaturaRel:resp.val().SensacionTermica,
                 X:resp.val().X.toFixed(3),
                 Y:resp.val().Y,
                 Z:resp.val().Z,
+                Velocidad:resp.val().Velocidad,
                 Latitude: resp.val().GPS.Latitude,
                 Longitude: resp.val().GPS.Longitude,
             };
@@ -185,7 +187,7 @@ const LeftLayout = ({ classes }) => {
 
   //Temporal
   let specialSensor =20;
-  let relativeTemperature = data.Temperatura+2;
+  let relativeTemperature = parseFloat(data.TemperaturaRel.toFixed(1))
   let location = "Monterrey, Mx";
 
   var meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
@@ -303,7 +305,7 @@ const LeftLayout = ({ classes }) => {
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Viento</Card.Title>
                                 <Card.Text>
-                                    {data.X} m/s
+                                    {data.Velocidad}
                                 </Card.Text>
                             </Card.Body>
                         </Paper>
