@@ -112,14 +112,17 @@ const LeftLayout = ({ classes }) => {
                 SensorID: resp.val().SensorID,
                 Sonido:resp.val().Sonido,
                 Temperatura:resp.val().Temperatura,
-                TemperaturaRel:resp.val().SensacionTermica,
+                TemperaturaRel:resp.val().SensacionTermica.toFixed(1),
                 X:resp.val().X.toFixed(3),
                 Y:resp.val().Y,
                 Z:resp.val().Z,
                 Velocidad:resp.val().Velocidad,
                 Latitude: resp.val().GPS.Latitude,
                 Longitude: resp.val().GPS.Longitude,
+                SpecialSensorReading: resp.val().SpecialSensor.SpecialSensorReading,
+                SpecialSensorTitle: resp.val().SpecialSensor.specialSensorTitle,
             };
+            
 
             const hours = new Date().getHours();
             const isDayTime = hours > 6 && hours < 20;
@@ -187,7 +190,7 @@ const LeftLayout = ({ classes }) => {
 
   //Temporal
   let specialSensor =20;
-  let relativeTemperature = parseFloat(data.TemperaturaRel.toFixed(1))
+  //let relativeTemperature = TemperaturaRel.toFixed(1);
   let location = "Monterrey, Mx";
 
   var meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
@@ -221,7 +224,7 @@ const LeftLayout = ({ classes }) => {
                                 <Card.Title className={classes.cardTitle}>{data.Temperatura}°C</Card.Title>
                                 <div className={classes.relativeTContainer}>
                                     <Card.Text className={classes.relativeT}>
-                                        Sensación térmica: {relativeTemperature}°C
+                                        Sensación térmica: {data.TemperaturaRel}°C
                                     </Card.Text>
                                 </div>
                             </Card.Body>
@@ -231,10 +234,10 @@ const LeftLayout = ({ classes }) => {
                         <Paper className={classes.paper} style={{background:backgroundColor}}>
                             <Image src="./img/iconsWeather/generic.png" className={classes.iconWeather} fluid/>
                             <Card.Body className={classes.cardBody}>
-                                <Card.Title className={classes.cardTitle}>{specialSensor} Autos</Card.Title>
+                                <Card.Title className={classes.cardTitle}>{data.SpecialSensorReading}</Card.Title>
                                 <div className={classes.relativeTContainer}>
                                     <Card.Text className={classes.relativeT}>
-                                        ID Estación: {data.SensorID}
+                                        ID Estación: {data.SensorID} | Sensor: {data.SpecialSensorTitle}
                                     </Card.Text>
                                 </div>
                             </Card.Body>

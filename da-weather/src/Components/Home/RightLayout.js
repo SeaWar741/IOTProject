@@ -64,7 +64,9 @@ const RightLayout = ({ classes }) => {
 
     async function fetchData(){
       //console.log("fetching  data..");
-      for (var i = 1; i <= 4; i++) {
+      const locationsd = await firebase.database().ref("iotproject-446e7");
+      console.log(locationsd);
+      for (var i = 1; i <= 1; i++) {
 
         const locations = await firebase.database().ref(i)
         //console.log("locations",locations);

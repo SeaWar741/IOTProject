@@ -1,5 +1,9 @@
 #include "DHT.h"
 #include <ArduinoJson.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <Wire.h>
+#include <SparkFun_ADXL345.h> 
 
 String message = "";//json
 bool messageReady = false;
@@ -15,9 +19,7 @@ DHT dht(5, DHT11);
 const int lightSensor = A0;
 
 //Acelerometro
-const int xpin = A1; // x-axis of the accelerometer
-const int ypin = A2; // y-axis
-const int zpin = A3; // z-axis
+ADXL345 adxl = ADXL345();
 
 //Lluvia
 const int rainSensor = A5; //sensor lluvia
@@ -108,6 +110,10 @@ void setup() {
   pinMode(redPin, OUTPUT);
   pinMode(greenPin, OUTPUT);
   pinMode(bluePin, OUTPUT);
+
+  //Acelerometro
+  adxl.powerOn();            
+  adxl.setRangeSetting(16);       //Definir el rango, valores 2, 4, 8 o 16
 }
 
 void loop() {
@@ -152,9 +158,8 @@ void loop() {
   
 
   //GIROSCOPIO
-  int x = analogRead(xpin); //read from xpin
-  int y = analogRead(ypin); //read from ypin
-  int z = analogRead(zpin); //read from zpin
+  int x,y,z;
+  adxl.readAccel(&x, &y, &z);  
   float zero_G = 512.0; //ADC is 0~1023 the zero g output equal to Vs/2
   float scale = 102.3; //ADXL335330 Sensitivity is 330mv/g
   String velocityValue = getSpeed(x,y);
