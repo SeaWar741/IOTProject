@@ -4,8 +4,8 @@
 String message = "";//json
 bool messageReady = false;
 
-const int IDSensor = 1; //<--Cambiar por el ID correspondiente
-const String specialSensorTitle = ""; //Nombre del sensor o medicion a realizar
+const int IDSensor = 4; //<--Cambiar por el ID correspondiente
+const String specialSensorTitle = "Vehiculos"; //Nombre del sensor o medicion a realizar
 
 // CONSTRUCTOR DEL OBJETO DHT RECIBE EL PIN EN EL QUE SE CONECTA EL SENSOR
 // Y TAMBIEN RECIBE EL TIPO DE SENSOR QUE VAMOS A CONECTAR
@@ -44,6 +44,8 @@ int yP = 0;
 //ejemplo: 
 //const int fuegoSensor = A8;
 //const int fuegoSensor = 9; //<-para digitales
+const int trigSensor = 7; 
+const int echoSensor = 6;
 
 //AQUI COLOCAR PIN DEL ACTUADOR ESPECIAL DE LA ESTACION formato -> especial(actuador)
 //ejemplo:
@@ -62,7 +64,11 @@ int lightVal;
 int volumen;
 //potenciometro
 int valueP = 0;
-
+//ultrasonico
+long duration;
+int distance;
+float specialSensorReading = 0;
+int counting = 0;
 
 void setColor(int redValue, int greenValue, int blueValue){
   analogWrite(redPin,redValue);
@@ -183,7 +189,29 @@ void loop() {
 
   //SENSOR ESPECIAL
   //Poner aqui el nombre de la variable y la lectura
-  float specialSensorReading = 0;
+  //Ultrasonico
+  digitalWrite(trigPin, LOW); 
+  delayMicroseconds(2);
+  
+  // Sets the trigPin on HIGH state for 10 micro seconds 
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  // Reads the echoPin, returns the sound wave travel time in microseconds 
+  duration = pulseIn(echoPin, HIGH);
+  
+  // Calculating the distance 
+  distance= duration*0.034/2;
+  
+  if (distance < 200 && distance > 10){ 
+    specialSensorReading = specialSensorReading + 1; 
+    delay(900);
+  }
+
+  if(specialSensorReading == 30){
+    specialSensorReading = 0;
+  }
 
 
   //SERIAL VERIFICATION
