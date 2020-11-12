@@ -2,7 +2,7 @@ import React, { useState,useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {Image } from 'react-bootstrap'
 
-import MapGL, { GeolocateControl,NavigationControl,Marker  } from '@urbica/react-map-gl';
+import MapGL, { GeolocateControl,NavigationControl,Marker,Popup   } from '@urbica/react-map-gl';
 import firebase from '../../Utils/Firebase';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -123,8 +123,9 @@ const RightLayout = ({ classes }) => {
   });
   
   const onMarkerClick = (event) => {
-    alert(event);
+    //alert(event.children);
     //console.log({ longitude: lngLat.lng, latitude: lngLat.lat });
+    console.log(event);
     
     event.stopPropagation();
   };
