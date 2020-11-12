@@ -64,7 +64,7 @@ const RightLayout = ({ classes }) => {
 
     async function fetchData(){
       //console.log("fetching  data..");
-      for (var i = 1; i <= 2; i++) {
+      for (var i = 1; i <= 4; i++) {
 
         const locations = await firebase.database().ref(i)
         //console.log("locations",locations);
@@ -72,8 +72,9 @@ const RightLayout = ({ classes }) => {
           let datas = {
             Latitude: resp.val().GPS.Latitude,
             Longitude: resp.val().GPS.Longitude,
+            ID: resp.val().SensorID
           };
-          //console.log("datas",datas);
+          console.log("datas",datas);
           dataArry.push(datas);
           setMarkersStatus(true);
         })
@@ -83,7 +84,7 @@ const RightLayout = ({ classes }) => {
       if(markersStatus){
         //console.log("dataArry 2: ", dataArry);
         dataArry.forEach((marker,index)=>{
-          //console.log("marker: ", marker);
+          console.log("marker: ", marker);
           markerLists.push( 
             <Marker key={index+1}
               longitude={marker.Longitude}
@@ -120,11 +121,16 @@ const RightLayout = ({ classes }) => {
   });
   
   const onMarkerClick = (event) => {
-    alert('You clicked on a station');
+    alert(event);
+    //console.log({ longitude: lngLat.lng, latitude: lngLat.lat });
     
     event.stopPropagation();
   };
   
+  const onDragEnd = (lngLat) => {
+    //setPosition({ longitude: lngLat.lng, latitude: lngLat.lat });
+    console.log({ longitude: lngLat.lng, latitude: lngLat.lat });
+  };
 
   return (
     <div className={classes.Main}>
@@ -136,6 +142,7 @@ const RightLayout = ({ classes }) => {
             longitude={viewport.longitude}
             zoom={viewport.zoom}
             onViewportChange={setViewport}
+            
         >
             <GeolocateControl position='top-right' />
             <NavigationControl showCompass showZoom position='top-right'/>
