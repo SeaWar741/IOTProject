@@ -2,7 +2,8 @@ import React, { useState,useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {Image } from 'react-bootstrap'
 
-import MapGL, { GeolocateControl,NavigationControl,Marker,Popup   } from '@urbica/react-map-gl';
+import MapGL, { GeolocateControl,NavigationControl,Marker,Popup,Source,Layer   } from '@urbica/react-map-gl';
+import { randomPoint } from '@turf/random';
 import firebase from '../../Utils/Firebase';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -27,45 +28,28 @@ const RightLayout = ({ classes }) => {
   const [data,setData] = useState();
   const [markerList,setMarkerList] = useState();
   const [markersStatus, setMarkersStatus] = useState(false);
-  
+  const [points, setPoints] = useState({
+    "type" : "FeatureCollection",
+    "features" : [{ 
+      "type" : "Feature", 
+      "properties" : {  
+        "capacity" : "10", 
+        "type" : "U-Rack",
+        "mount" : "Surface"
+      }, 
+      "geometry" : { 
+        "type" : "Point", 
+        "coordinates" : [ -71.073283, 42.417500 ] 
+      }
+    }]
+  });
   
   useEffect (()=>{
     const dataReference = firebase.database();
 
     let dataArry = [];
-    //console.log("dataArry: ", dataArry);
-    /* const fetchData = () =>{
-      for (var i = 1; i <= 2; i++) {
-        firebase.database().ref(i).on("value",resp=>{
-            //console.log(snapshot.val().Temperatura);
-            let datas = {
-                Latitude: resp.val().GPS.Latitude,
-                Longitude: resp.val().GPS.Longitude,
-            };
-            console.log("markers: ",datas);
-            dataArry.push(datas);
-        });
-      }
-      
-      let markerLists = [];
-      dataArry.forEach((marker,index)=>{
-        markerLists.push( 
-          <Marker key={index+1}
-            longitude={marker.Longitude}
-            latitude={marker.Latitude}
-            onClick={onMarkerClick}
-          >
-            <Image src="./img/mapPointer.png" fluid className={classes.imageMarker}/>
-          </Marker>
-        )
-      })
-      setMarkerList(markerLists);
-    } */
-
     async function fetchData(){
-      //console.log("fetching  data..");
-      const locationsd = await firebase.database().ref("iotproject-446e7");
-      console.log(locationsd);
+    
       for (var i = 1; i <= 1; i++) {
 
         const locations = await firebase.database().ref(i)
@@ -117,11 +101,6 @@ const RightLayout = ({ classes }) => {
     zoom: 10
   });
 
-  const [position, setPosition] = useState({
-    longitude: -100.286697388,
-    latitude: 25.63986969
-  });
-  
   const onMarkerClick = (event) => {
     //alert(event.children);
     //console.log({ longitude: lngLat.lng, latitude: lngLat.lat });
@@ -134,9 +113,27 @@ const RightLayout = ({ classes }) => {
     //setPosition({ longitude: lngLat.lng, latitude: lngLat.lat });
     console.log({ longitude: lngLat.lng, latitude: lngLat.lat });
   };
+  
+  const addPoints = () => {
+    const randomPoints = randomPoint(1);
+    console.log(randomPoints)
+    const newFeatures = points.features.concat(randomPoints.features);
+    const newPoints = { ...points, features: newFeatures };
+    //console.log(newPoints);
+    setPoints(newPoints);
+  };
+
+  const onClick = (event) => {
+    //alert(event.children);
+    //console.log({ longitude: lngLat.lng, latitude: lngLat.lat });
+    console.log(event);
+    
+    //event.stopPropagation();
+  };
 
   return (
     <div className={classes.Main}>
+      <button onClick={addPoints}>+100 points</button>
         <MapGL
             style={{ width: '100%', minHeight: '100vh' }}
             mapStyle='mapbox://styles/mapbox/light-v9'
@@ -148,8 +145,17 @@ const RightLayout = ({ classes }) => {
             
         >
             <GeolocateControl position='top-right' />
-            <NavigationControl showCompass showZoom position='top-right'/>
-            {markerList}
+            <Source id='points' type='geojson' data={points} />
+            <Layer
+              id='points'
+              type='circle'
+              source='points'
+              paint={{
+                'circle-radius': 6,
+                'circle-color': '#1978c8'
+              }}
+              onClick={onClick}
+            />
         </MapGL>
     </div>
   );
