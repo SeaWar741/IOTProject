@@ -29,8 +29,13 @@ const RightLayout = ({ classes }) => {
   const [markerList,setMarkerList] = useState();
   const [markersStatus, setMarkersStatus] = useState(false);
   const [points, setPoints] = useState({
-    "type" : "FeatureCollection",
-    "features" : [{ 
+    type : "FeatureCollection",
+    features : []
+  });
+
+
+  /** 
+   *  
       "type" : "Feature", 
       "properties" : {  
         "capacity" : "10", 
@@ -41,8 +46,7 @@ const RightLayout = ({ classes }) => {
         "type" : "Point", 
         "coordinates" : [ -71.073283, 42.417500 ] 
       }
-    }]
-  });
+  */
   
   useEffect (()=>{
     const dataReference = firebase.database();
@@ -60,17 +64,34 @@ const RightLayout = ({ classes }) => {
             Longitude: resp.val().GPS.Longitude,
             ID: resp.val().SensorID
           };
-          console.log("datas",datas);
+          //console.log("datas",datas);
           dataArry.push(datas);
+
           setMarkersStatus(true);
         })
       }
 
       let markerLists = [];
+      let points = [];
       if(markersStatus){
         //console.log("dataArry 2: ", dataArry);
         dataArry.forEach((marker,index)=>{
           console.log("marker: ", marker);
+          
+          var randomPoints = {
+            type : "Feature", 
+            properties : {  
+              ID : marker.ID,
+            }, 
+            geometry : { 
+              type : "Point", 
+              coordinates : [ marker.Latitude, marker.Longitude] 
+            }
+          };
+          console.log(randomPoints);
+          const newFeatures = points.features.concat(randomPoints.features);
+          const newPoints = { ...points, features: newFeatures };
+
           markerLists.push( 
             <Marker key={index+1}
               longitude={marker.Longitude}
@@ -87,10 +108,6 @@ const RightLayout = ({ classes }) => {
       
     }
     fetchData();
-    
-
-    
-
   },[markersStatus]);  
   
   
@@ -116,10 +133,11 @@ const RightLayout = ({ classes }) => {
   
   const addPoints = () => {
     const randomPoints = randomPoint(1);
-    console.log(randomPoints)
+    console.log("Punto generado");
+    console.log(randomPoints);
     const newFeatures = points.features.concat(randomPoints.features);
     const newPoints = { ...points, features: newFeatures };
-    //console.log(newPoints);
+    console.log(newPoints);
     setPoints(newPoints);
   };
 
@@ -133,7 +151,7 @@ const RightLayout = ({ classes }) => {
 
   return (
     <div className={classes.Main}>
-      <button onClick={addPoints}>+100 points</button>
+      <button onClick={addPoints}>Add points</button>
         <MapGL
             style={{ width: '100%', minHeight: '100vh' }}
             mapStyle='mapbox://styles/mapbox/light-v9'
