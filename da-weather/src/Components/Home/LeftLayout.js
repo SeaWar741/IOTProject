@@ -7,8 +7,9 @@ import {LocationMarker} from '@styled-icons/heroicons-solid/LocationMarker';
 import {Calendar} from '@styled-icons/boxicons-regular/Calendar';
 import axios from "axios";
 import firebase from '../../Utils/Firebase';
-
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useDataLayerValue } from '../../DataLayer';
+
 
 const useStyles = makeStyles((theme) => ({
   Main:{
@@ -84,6 +85,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 const LeftLayout = ({ classes }) => {
+  const [{ID}] = useDataLayerValue();
   classes = useStyles();
 
   //const data = useData();
@@ -93,6 +95,7 @@ const LeftLayout = ({ classes }) => {
   const [background,setBackground] = useState("./img/background/Good.jpg");
   const [cityLocation, setCityLocation] = useState("");
   const [dataStatus, setDataStatus] = useState(false);
+  const [backgroundColor, setBackgroundColor] = useState('"rgba(255, 255, 255, .6)"');
   
   useEffect (()=>{
     const dataReference = firebase.database().ref(1);
@@ -102,21 +105,26 @@ const LeftLayout = ({ classes }) => {
             //console.log(snapshot.val().Temperatura);
             let datas = {
                 ADC_MQ: resp.val().ADC_MQ,
-                Concentracion: resp.val().Concentracion,
+                Concentracion: resp.val().Concentracion.toFixed(3),
                 Humedad: resp.val().Humedad,
                 Lluvia:resp.val().Lluvia,
                 Luz:resp.val().Luz,
                 Potenciometro:resp.val().Potenciometro,
                 Rs:resp.val().Rs,
-                SensorID: 1,
+                SensorID: resp.val().SensorID,
                 Sonido:resp.val().Sonido,
                 Temperatura:resp.val().Temperatura,
-                X:resp.val().X,
+                TemperaturaRel:resp.val().SensacionTermica.toFixed(1),
+                X:resp.val().X.toFixed(3),
                 Y:resp.val().Y,
                 Z:resp.val().Z,
+                Velocidad:resp.val().Velocidad,
                 Latitude: resp.val().GPS.Latitude,
                 Longitude: resp.val().GPS.Longitude,
+                SpecialSensorReading: resp.val().SpecialSensor.SpecialSensorReading,
+                SpecialSensorTitle: resp.val().SpecialSensor.specialSensorTitle,
             };
+            
 
             const hours = new Date().getHours();
             const isDayTime = hours > 6 && hours < 20;
@@ -184,7 +192,7 @@ const LeftLayout = ({ classes }) => {
 
   //Temporal
   let specialSensor =20;
-  let relativeTemperature = data.Temperatura+2;
+  //let relativeTemperature = TemperaturaRel.toFixed(1);
   let location = "Monterrey, Mx";
 
   var meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
@@ -202,47 +210,47 @@ const LeftLayout = ({ classes }) => {
             <div className={classes.cardContainer}>
                 <Grid container spacing={3}>
                     <Grid item xs={6}>
-                        <Paper className={classes.paper}>
+                        <Paper className={classes.paper} style={{background:backgroundColor}}>
                             <p className={classes.headerText}><LocationMarker size="40"/> {cityLocation}</p>
                         </Paper>
                     </Grid>
                     <Grid item xs={6}>
-                        <Paper className={classes.paper}>
+                        <Paper className={classes.paper} style={{background:backgroundColor}}>
                             <p className={classes.headerText}><Calendar size="40"/> {currentDate}</p>
                         </Paper>
                     </Grid>
                     <Grid item xs={6}>
-                        <Paper className={classes.paper}>
+                        <Paper className={classes.paper} style={{background:backgroundColor}}>
                             <Image src={icon} className={classes.iconWeather} fluid/>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitle}>{data.Temperatura}°C</Card.Title>
                                 <div className={classes.relativeTContainer}>
                                     <Card.Text className={classes.relativeT}>
-                                        Sensación térmica: {relativeTemperature}°C
+                                        Sensación térmica: {data.TemperaturaRel}°C
                                     </Card.Text>
                                 </div>
                             </Card.Body>
                         </Paper>
                     </Grid>
                     <Grid item xs={6}>
-                        <Paper className={classes.paper}>
+                        <Paper className={classes.paper} style={{background:backgroundColor}}>
                             <Image src="./img/iconsWeather/generic.png" className={classes.iconWeather} fluid/>
                             <Card.Body className={classes.cardBody}>
-                                <Card.Title className={classes.cardTitle}>{specialSensor} Autos</Card.Title>
+                                <Card.Title className={classes.cardTitle}>{data.SpecialSensorReading}</Card.Title>
                                 <div className={classes.relativeTContainer}>
                                     <Card.Text className={classes.relativeT}>
-                                        ID Estación: {data.SensorID}
+                                        ID Estación: {data.SensorID} | Sensor: {data.SpecialSensorTitle}
                                     </Card.Text>
                                 </div>
                             </Card.Body>
                         </Paper>
                     </Grid>
                     <Grid item xs={3}>
-                        <Paper className={classes.paper}>
+                        <Paper className={classes.paper} style={{background:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Humedad</Card.Title>
                                 <Card.Text>
-                                    {data.Humedad}
+                                    {data.Humedad}%
                                 </Card.Text>
                             </Card.Body>
                         </Paper>
@@ -252,43 +260,43 @@ const LeftLayout = ({ classes }) => {
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Luz</Card.Title>
                                 <Card.Text>
-                                    {data.Luz}
+                                    {data.Luz} lumens
                                 </Card.Text>
                             </Card.Body>
                         </Paper>
                     </Grid>
                     <Grid item xs={3}>
-                        <Paper className={classes.paper}>
+                        <Paper className={classes.paper} style={{background:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Sonido</Card.Title>
                                 <Card.Text>
-                                    {data.Sonido}
+                                    {data.Sonido} db
                                 </Card.Text>
                             </Card.Body>
                         </Paper>
                     </Grid>
                     <Grid item xs={3}>
-                        <Paper className={classes.paper}>
+                        <Paper className={classes.paper} style={{background:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Temperatura</Card.Title>
                                 <Card.Text>
-                                    {data.Temperatura}
+                                    {data.Temperatura} °C
                                 </Card.Text>
                             </Card.Body>
                         </Paper>
                     </Grid>
                     <Grid item xs={3}>
-                        <Paper className={classes.paper}>
+                        <Paper className={classes.paper} style={{background:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>CO2</Card.Title>
                                 <Card.Text>
-                                    {data.Concentracion}
+                                    {data.Concentracion} mg/L
                                 </Card.Text>
                             </Card.Body>
                         </Paper>
                     </Grid>
                     <Grid item xs={3}>
-                        <Paper className={classes.paper}>
+                        <Paper className={classes.paper} style={{background:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Lluvia</Card.Title>
                                 <Card.Text>
@@ -298,17 +306,17 @@ const LeftLayout = ({ classes }) => {
                         </Paper>
                     </Grid>
                     <Grid item xs={3}>
-                        <Paper className={classes.paper}>
+                        <Paper className={classes.paper} style={{background:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Viento</Card.Title>
                                 <Card.Text>
-                                    {data.X}
+                                    {data.Velocidad}
                                 </Card.Text>
                             </Card.Body>
                         </Paper>
                     </Grid>
                     <Grid item xs={3}>
-                        <Paper className={classes.paper}>
+                        <Paper className={classes.paper} style={{background:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>RS</Card.Title>
                                 <Card.Text>
@@ -319,6 +327,7 @@ const LeftLayout = ({ classes }) => {
                     </Grid>
                 </Grid>
             </div>
+            <p style={{textAlign: "center", fontSize: "40px"}}>ID: {ID}</p>
         </div>
   );
 };

@@ -1,11 +1,15 @@
 #include "DHT.h"
 #include <ArduinoJson.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <Wire.h>
+#include <SparkFun_ADXL345.h> 
 
 String message = "";//json
 bool messageReady = false;
 
-const int IDSensor = 1; //<--Cambiar por el ID correspondiente
-const String specialSensorTitle = ""; //Nombre del sensor o medicion a realizar
+const int IDSensor = 3; //<--Cambiar por el ID correspondiente
+const String specialSensorTitle = "Fuego"; //Nombre del sensor o medicion a realizar
 
 // CONSTRUCTOR DEL OBJETO DHT RECIBE EL PIN EN EL QUE SE CONECTA EL SENSOR
 // Y TAMBIEN RECIBE EL TIPO DE SENSOR QUE VAMOS A CONECTAR
@@ -15,9 +19,7 @@ DHT dht(5, DHT11);
 const int lightSensor = A0;
 
 //Acelerometro
-const int xpin = A1; // x-axis of the accelerometer
-const int ypin = A2; // y-axis
-const int zpin = A3; // z-axis
+ADXL345 adxl = ADXL345();
 
 //Lluvia
 const int rainSensor = A5; //sensor lluvia
@@ -42,7 +44,7 @@ int yP = 0;
 
 //AQUI COLOCAR PIN DEL SENSOR ESPECIAL DE LA ESTACION formato -> (medicion)Sensor
 //ejemplo: 
-//const int fuegoSensor = A8;
+const int fuegoSensor = A8;
 //const int fuegoSensor = 9; //<-para digitales
 
 //AQUI COLOCAR PIN DEL ACTUADOR ESPECIAL DE LA ESTACION formato -> especial(actuador)
@@ -108,6 +110,10 @@ void setup() {
   pinMode(redPin, OUTPUT);
   pinMode(greenPin, OUTPUT);
   pinMode(bluePin, OUTPUT);
+
+  //Acelerometro
+  adxl.powerOn();            
+  adxl.setRangeSetting(16);       //Definir el rango, valores 2, 4, 8 o 16
 }
 
 void loop() {
@@ -152,9 +158,8 @@ void loop() {
   
 
   //GIROSCOPIO
-  int x = analogRead(xpin); //read from xpin
-  int y = analogRead(ypin); //read from ypin
-  int z = analogRead(zpin); //read from zpin
+  int x,y,z;
+  adxl.readAccel(&x, &y, &z);  
   float zero_G = 512.0; //ADC is 0~1023 the zero g output equal to Vs/2
   float scale = 102.3; //ADXL335330 Sensitivity is 330mv/g
   String velocityValue = getSpeed(x,y);
@@ -183,7 +188,7 @@ void loop() {
 
   //SENSOR ESPECIAL
   //Poner aqui el nombre de la variable y la lectura
-  float specialSensorReading = 0;
+  float specialSensorReading = analogRead(A8);
 
 
   //SERIAL VERIFICATION
@@ -207,7 +212,7 @@ void loop() {
     }
 
     if(doc["type"] == "request") {
-
+/*
       if(doc["L"]==0){
         setColor(0,0,0);//off
       }
@@ -215,16 +220,21 @@ void loop() {
         setColor(255,0,0);//red
       }
       if(doc["L"]==2){
-        setColor(0,0,255);//green
+        setColor(0,0,255);//blue
       }
       if(doc["L"]==3){
-       setColor(0,255,0);//blue
+       setColor(0,255,0);//green
       }
       if(doc["L"]==4){
         setColor(255,255,255);//white
       }
-
+*/
       //Aqui trabajar el actuador extra de cada uno
+      if (specialSensorReading < 700){
+        setColor(255,0,0);
+      }else{
+        setColor(0,0,255);
+        }
       /*
        * ejemplo
        * if(doc[E]>30){ <-- El doc[extra] funciona como input remoto

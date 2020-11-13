@@ -6,8 +6,8 @@
 #include <ArduinoJson.h>
 
 ESP8266WebServer server;
-char* ssid = "Note 10+ Juan Carlos";
-char* password = "Juan2000";
+char* ssid = "INFINITUM53M8_2.4";
+char* password = "DZrp5rDqKP";
 
 //FIREBASE
 #define FIREBASE_HOST "iotproject-446e7.firebaseio.com"
@@ -19,7 +19,7 @@ FirebaseJson json;
 int n = 0;
 
 //Replace with Station ID
-String path = "/1/"; //<--Cambiar por el ID correspondiente
+String path = "/3/"; //<--Cambiar por el ID correspondiente
 
 //GPS API Google
 //Credentials for Google GeoLocation API...
