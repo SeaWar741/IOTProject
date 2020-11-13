@@ -86,8 +86,7 @@ const useStyles = makeStyles((theme) => ({
 
 const LeftLayout = ({ classes }) => {
   const [{ID}] = useDataLayerValue();
-  console.log(ID);
-  const [prevID, setPrevID] = useState(null);
+  //console.log(ID);
 
 
   classes = useStyles();
@@ -190,9 +189,8 @@ const LeftLayout = ({ classes }) => {
         }
 
     }
-    setPrevID(ID);
     fetchData();
-},[dataStatus]);  
+},[ID,dataStatus]);  
 
   
 
