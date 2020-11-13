@@ -64,7 +64,7 @@ const RightLayout = ({ classes }) => {
 
     async function fetchData(){
       //console.log("fetching  data..");
-      for (var i = 1; i <= 2; i++) {
+      for (var i = 1; i < 4; i++) {
 
         const locations = await firebase.database().ref(i)
         //console.log("locations",locations);
@@ -81,7 +81,7 @@ const RightLayout = ({ classes }) => {
 
       let markerLists = [];
       if(markersStatus){
-        //console.log("dataArry 2: ", dataArry);
+        console.log("dataArry: ", dataArry);
         dataArry.forEach((marker,index)=>{
           //console.log("marker: ", marker);
           markerLists.push( 
