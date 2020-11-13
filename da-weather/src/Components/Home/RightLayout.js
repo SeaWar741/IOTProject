@@ -58,7 +58,7 @@ const RightLayout = ({ classes }) => {
     let dataArry = [];
     async function fetchData(){
     
-      for (var i = 3; i <= 4; i++) {
+      for (var i = 1; i <= 4; i++) {
 
         const locations = await firebase.database().ref(i)
         //console.log("locations",locations);
@@ -173,6 +173,7 @@ const RightLayout = ({ classes }) => {
     }
   },[ID,hourStatus]);
 
+  console.log(points);
 
   return (
     <div className={classes.Main}>
