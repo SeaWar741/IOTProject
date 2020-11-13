@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState,useEffect} from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {Image } from 'react-bootstrap'
 
@@ -9,6 +9,8 @@ import firebase from '../../Utils/Firebase';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useDataLayerValue } from '../../DataLayer';
+
+
 const useStyles = makeStyles((theme) => ({
   Main:{
     backgroundColor:"#E3E5E3",
@@ -24,6 +26,8 @@ const useStyles = makeStyles((theme) => ({
 
 const RightLayout = ({ classes }) => {
   const [{ID}, dispatch] = useDataLayerValue();
+  
+
   classes = useStyles();
 
   const [data,setData] = useState();
@@ -33,25 +37,10 @@ const RightLayout = ({ classes }) => {
     type : "FeatureCollection",
     features : []
   });
-
-
-  /** 
-   *  
-      "type" : "Feature", 
-      "properties" : {  
-        "capacity" : "10", 
-        "type" : "U-Rack",
-        "mount" : "Surface"
-      }, 
-      "geometry" : { 
-        "type" : "Point", 
-        "coordinates" : [ -71.073283, 42.417500 ] 
-      }
-  */
   
   useEffect (()=>{
     const dataReference = firebase.database();
-    console.log("pass");
+    //console.log("pass");
     let dataArry = [];
     async function fetchData(){
     
@@ -72,71 +61,30 @@ const RightLayout = ({ classes }) => {
         })
       }
 
-      //let markerLists = [];
+      let markerLists = [];
       //let points = [];
       if(markersStatus){
-        console.log("dataArry: ", dataArry);
+        //console.log("dataArry: ", dataArry);
         dataArry.forEach((marker,index)=>{
-          console.log("marker: ", marker);
-          
-          /* var randomPoints = {
-            type : "Feature", 
-            properties : {  
-              ID : marker.ID,
-            }, 
-            geometry : { 
-              type : "Point", 
-              coordinates : [ marker.Latitude, marker.Longitude] 
-            }
-          }; */
-          /* var newPoint1 = {
-            type : "FeatureCollection",
-            features: {
-                type: "Feature",
-                geometry: {
-                  type: "Point",
-                  coordinates: [marker.Longitude, marker.Latitude]
-                },
-                properties: {
-                  ID: marker.ID
-                }
-            }
-          };
-          console.log("103", newPoint1);
-          const newFeatures = points.features.concat(newPoint1.features);
-          console.log("set features...", newFeatures);
-          const newPoints = { ...points, features: newFeatures };
-          console.log("108",newPoints);
-          setPoints(newPoints);
-          console.log("112",points); */
-          /* console.log("91",randomPoints);
-          console.log("92",points);
-          const newFeatures = points.features.concat(randomPoints.features);
-          console.log("set features..", newFeatures);
-          const newPoints = { ...points, features: newFeatures };
+          //console.log("marker: ", marker);
 
-          setPoints(newPoints);
-          console.log("set points..");
-          console.log("98",newPoints); */
-          /* markerLists.push( 
+
+          markerLists.push( 
             <Marker key={index+1}
               longitude={marker.Longitude}
               latitude={marker.Latitude}
-              onClick={onMarkerClick}
             >
               <Image src="./img/mapPointer.png" fluid className={classes.imageMarker}/>
             </Marker>
-          ) */
+          )
         })
-        //setMarkerList(markerLists);
+        setMarkerList(markerLists);
       }
       
       
     }
     fetchData();
   },[markersStatus]);  
-  
-  
   
   const [viewport, setViewport] = useState({
     latitude: 25.6714,
@@ -181,21 +129,22 @@ const RightLayout = ({ classes }) => {
           }
       }
     };
-    console.log("103", newPoint1);
+    //console.log("103", newPoint1);
     const newFeatures = points.features.concat(newPoint1.features);
-    console.log("set features...", newFeatures);
+    //console.log("set features...", newFeatures);
     const newPoints = { ...points, features: newFeatures };
-    console.log("108",newPoints);
+    //console.log("108",newPoints);
     setPoints(newPoints);
-    console.log("112",points);
+    //console.log("112",points);
   }
 
   const markerOnClick = (event) => {
-    //alert(event.children);
-    //console.log({ longitude: lngLat.lng, latitude: lngLat.lat });
-    console.log(event.children);
-    
-    //event.stopPropagation();
+    //console.log(event.features[0].properties.ID);
+    //setSelectedStation(event.features[0].properties.ID);
+    dispatch({
+      type:"SET_ID",
+      ID:event.features[0].properties.ID
+    });
   };
 
   return (
@@ -213,6 +162,7 @@ const RightLayout = ({ classes }) => {
         >
             <GeolocateControl position='top-right' />
             <Source id='points' type='geojson' data={points} />
+            <Image id='my-image' image={"./img/mapPointer.png"} />
             <Layer
               id='points'
               type='circle'
@@ -221,8 +171,18 @@ const RightLayout = ({ classes }) => {
                 'circle-radius': 6,
                 'circle-color': '#1978c8'
               }}
+              /*
+              id='points'
+              type='symbol'
+              source='points'
+              layout={{
+                'icon-image': 'my-image',
+                'icon-size': 0.25
+              }}
+              */
               onClick={markerOnClick}
             />
+            
         </MapGL>
     </div>
   );

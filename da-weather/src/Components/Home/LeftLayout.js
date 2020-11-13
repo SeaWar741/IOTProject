@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState} from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {Image,Card } from 'react-bootstrap'
 import Paper from '@material-ui/core/Paper';
@@ -86,6 +86,10 @@ const useStyles = makeStyles((theme) => ({
 
 const LeftLayout = ({ classes }) => {
   const [{ID}] = useDataLayerValue();
+  console.log(ID);
+  const [prevID, setPrevID] = useState(null);
+
+
   classes = useStyles();
 
   //const data = useData();
@@ -95,13 +99,13 @@ const LeftLayout = ({ classes }) => {
   const [background,setBackground] = useState("./img/background/Good.jpg");
   const [cityLocation, setCityLocation] = useState("");
   const [dataStatus, setDataStatus] = useState(false);
-  const [backgroundColor, setBackgroundColor] = useState('"rgba(255, 255, 255, .6)"');
+  const [backgroundColor, setBackgroundColor] = useState('"rgba(255, 255, 255, .6)"'); //<--Para dark mode
   
   useEffect (()=>{
-    const dataReference = firebase.database().ref(1);
+    //const dataReference = firebase.database().ref(ID);
     
     async function fetchData(){
-        firebase.database().ref(1).on("value",resp=>{
+        firebase.database().ref(ID).on("value",resp=>{
             //console.log(snapshot.val().Temperatura);
             let datas = {
                 ADC_MQ: resp.val().ADC_MQ,
@@ -113,7 +117,7 @@ const LeftLayout = ({ classes }) => {
                 Rs:resp.val().Rs,
                 SensorID: resp.val().SensorID,
                 Sonido:resp.val().Sonido,
-                Temperatura:resp.val().Temperatura,
+                Temperatura:resp.val().Temperatura.toFixed(1),
                 TemperaturaRel:resp.val().SensacionTermica.toFixed(1),
                 X:resp.val().X.toFixed(3),
                 Y:resp.val().Y,
@@ -125,7 +129,6 @@ const LeftLayout = ({ classes }) => {
                 SpecialSensorTitle: resp.val().SpecialSensor.specialSensorTitle,
             };
             
-
             const hours = new Date().getHours();
             const isDayTime = hours > 6 && hours < 20;
 
@@ -174,6 +177,7 @@ const LeftLayout = ({ classes }) => {
             else{
                 setIcon("./img/iconsWeather/PartyCloudy.png");
                 isDayTime ? setBackground("./img/background/Cloudy.jpg") : setBackground("./img/background/Night.jpg");
+                isDayTime ? setBackgroundColor('"rgba(255, 255, 255, .6)"') : setBackgroundColor('"rgba(0, 0, 0, .6)"');
             }
             
             setData(datas);
@@ -184,23 +188,25 @@ const LeftLayout = ({ classes }) => {
             const newRequest = await axios.get("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + data.Latitude +  "," + data.Longitude + "&key=" + process.env.REACT_APP_APIKEY_GEOCODING);
             setCityLocation(newRequest.data.results[4].formatted_address);
         }
+
     }
+    setPrevID(ID);
     fetchData();
-  },[dataStatus]);  
+},[dataStatus]);  
 
   
 
   //Temporal
-  let specialSensor =20;
+  //let specialSensor =20;
   //let relativeTemperature = TemperaturaRel.toFixed(1);
-  let location = "Monterrey, Mx";
+  //let location = "Monterrey, Mx";
 
   var meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   var diasSemana = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
   var f = new Date();
   let currentDate = diasSemana[f.getDay()] + ", " + f.getDate() + " de " + meses[f.getMonth()] + " de " + f.getFullYear();
   
-  console.log("url('"+icon+"')");
+  //console.log("url('"+icon+"')");
     
   return (
         <div className={classes.Main}   style={{backgroundImage :"url('"+background+"')"}}>
@@ -327,7 +333,6 @@ const LeftLayout = ({ classes }) => {
                     </Grid>
                 </Grid>
             </div>
-            <p style={{textAlign: "center", fontSize: "40px"}}>ID: {ID}</p>
         </div>
   );
 };
