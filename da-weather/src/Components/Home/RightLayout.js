@@ -1,13 +1,15 @@
 import React, { useState,useEffect} from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import {Image } from 'react-bootstrap'
 
-import MapGL, { GeolocateControl,NavigationControl,Marker,Popup,Source,Layer   } from '@urbica/react-map-gl';
+
+import MapGL, { GeolocateControl,NavigationControl,Marker,Image ,Source,Layer,TrafficControl } from '@urbica/react-map-gl';
 import { randomPoint } from '@turf/random';
 import firebase from '../../Utils/Firebase';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import "bootstrap/dist/css/bootstrap.min.css";
+import '@mapbox/mapbox-gl-traffic/mapbox-gl-traffic.css';
+
 import { useDataLayerValue } from '../../DataLayer';
 
 
@@ -20,6 +22,9 @@ const useStyles = makeStyles((theme) => ({
   },
   imageMarker:{
       height:"16vh"
+  },
+  mapPoint:{
+    cursor: "pointer"
   }
 }));
 
@@ -38,6 +43,15 @@ const RightLayout = ({ classes }) => {
     features : []
   });
   
+  const [showTraffic, setShowTraffic] = useState(true);
+  const [showTrafficButton, setShowTrafficButton] = useState(true);
+  const [themeMap,setThemeMap] = useState('mapbox://styles/mapbox/light-v9')
+  const [hourStatus,setHourEnabled] = useState(false)
+
+  const toggleTraffic = () => setShowTraffic(showTraffic);
+  const toggleButton = () => setShowTrafficButton(showTrafficButton);
+
+
   useEffect (()=>{
     const dataReference = firebase.database();
     //console.log("pass");
@@ -147,12 +161,24 @@ const RightLayout = ({ classes }) => {
     });
   };
 
+  const hours = new Date().getHours();
+  const isDayTime = hours > 6 && hours < 20;
+
+  useEffect(()=>{
+    if(isDayTime){
+      setThemeMap('mapbox://styles/mapbox/light-v9');
+    }
+    else{
+      setThemeMap('mapbox://styles/mapbox/dark-v9');
+    }
+  },[ID,hourStatus]);
+
+
   return (
     <div className={classes.Main}>
-      {/* <button onClick={addPoints}>Add points</button> */}
         <MapGL
             style={{ width: '100%', minHeight: '100vh' }}
-            mapStyle='mapbox://styles/mapbox/light-v9'
+            mapStyle={themeMap}
             accessToken= {process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
             latitude={viewport.latitude}
             longitude={viewport.longitude}
@@ -161,8 +187,9 @@ const RightLayout = ({ classes }) => {
             
         >
             <GeolocateControl position='top-right' />
+            <NavigationControl showCompass showZoom position='top-right' />
             <Source id='points' type='geojson' data={points} />
-            <Image id='my-image' image={"./img/mapPointer.png"} />
+            <Image id='my-image' image={"./img/mapPointer.png"} className={classes.mapPoint}/>
             <Layer
               id='points'
               type='circle'
@@ -182,7 +209,17 @@ const RightLayout = ({ classes }) => {
               */
               onClick={markerOnClick}
             />
-            
+            <Layer
+              id='pointss'
+              type='symbol'
+              source='points'
+              layout={{
+                'icon-image': 'my-image',
+                'icon-size': 0.25
+              }}
+              onClick={markerOnClick}
+            />
+            <TrafficControl showTraffic={showTraffic} showTrafficButton={showTrafficButton} />
         </MapGL>
     </div>
   );
