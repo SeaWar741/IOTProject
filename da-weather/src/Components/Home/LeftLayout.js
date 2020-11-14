@@ -88,7 +88,7 @@ const useStyles = makeStyles((theme) => ({
 
 const LeftLayout = ({ classes }) => {
   const [{ID}] = useDataLayerValue();
-  //console.log(ID);
+  console.log(ID);
 
 
   classes = useStyles();
@@ -194,7 +194,7 @@ const LeftLayout = ({ classes }) => {
 
     async function fetchLocation(){
         if(dataStatus){
-            //console.log(data.SensorID);
+            console.log(data.SensorID);
             const newRequest = await axios.get("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + data.Latitude +  "," + data.Longitude + "&key=" + process.env.REACT_APP_APIKEY_GEOCODING);
             setCityLocation(newRequest.data.results[4].formatted_address);
         }

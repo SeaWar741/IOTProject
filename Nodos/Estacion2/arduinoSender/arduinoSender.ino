@@ -4,8 +4,8 @@
 String message = "";//json
 bool messageReady = false;
 
-const int IDSensor = 1; //<--Cambiar por el ID correspondiente
-const String specialSensorTitle = ""; //Nombre del sensor o medicion a realizar
+const int IDSensor = 2; //<--Cambiar por el ID correspondiente
+const String specialSensorTitle = "Huracanes"; //Nombre del sensor o medicion a realizar
 
 // CONSTRUCTOR DEL OBJETO DHT RECIBE EL PIN EN EL QUE SE CONECTA EL SENSOR
 // Y TAMBIEN RECIBE EL TIPO DE SENSOR QUE VAMOS A CONECTAR
