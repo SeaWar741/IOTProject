@@ -88,7 +88,7 @@ const useStyles = makeStyles((theme) => ({
 
 const LeftLayout = ({ classes }) => {
   const [{ID}] = useDataLayerValue();
-  console.log(ID);
+  //console.log(ID);
 
 
   classes = useStyles();
@@ -106,7 +106,7 @@ const LeftLayout = ({ classes }) => {
     //const dataReference = firebase.database().ref(ID);
     
     async function fetchData(){
-        firebase.database().ref(ID).on("value",resp=>{
+        firebase.database().ref("Nodes/"+ID).on("value",resp=>{
             //console.log(snapshot.val().Temperatura);
             let datas = {
                 ADC_MQ: resp.val().ADC_MQ,
@@ -189,16 +189,17 @@ const LeftLayout = ({ classes }) => {
     }
     fetchData();
     
-    console.log(data.SensorID);
-},[ID,dataStatus]);  
+    //console.log(data.SensorID);
+},[ID,dataStatus,backgroundColor]);  
 
     async function fetchLocation(){
         if(dataStatus){
-            console.log(data.SensorID);
+            //console.log(data.SensorID);
             const newRequest = await axios.get("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + data.Latitude +  "," + data.Longitude + "&key=" + process.env.REACT_APP_APIKEY_GEOCODING);
             setCityLocation(newRequest.data.results[4].formatted_address);
         }
     }
+    
     fetchLocation();
 
 
