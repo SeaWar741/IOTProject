@@ -35,8 +35,8 @@ const int gasSensor = A6;
 
 //colores led
 const int redPin = 10;
-const int greenPin = 9;
-const int bluePin = 8;
+const int bluePin = 9;
+const int greenPin = 8;
 
 //Previous speed
 int xP = 0;
@@ -151,7 +151,7 @@ void loop() {
   // REVISAR QUE LOS RESULTADOS SEAN VALORES NUMERICOS VALIDOS, INDICANDO QUE LA COMUNICACION ES CORRECTA
   
   if (isnan(humedad) || isnan(temperatura)) {
-    //Serial.println("Falla al leer el sensor DHT11!");
+    Serial.println("Falla al leer el sensor DHT11!");
     return;
   }
 
@@ -230,10 +230,10 @@ void loop() {
       }
 */
       //Aqui trabajar el actuador extra de cada uno
-      if (specialSensorReading < 700){
-        setColor(255,0,0);
+      if (specialSensorReading < 500){
+        setColor(0,255,255);
       }else{
-        setColor(0,0,255);
+        setColor(255,255,0);
         }
       /*
        * ejemplo
