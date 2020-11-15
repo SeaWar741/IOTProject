@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
     textAlign:"center"
   },
   imageTop:{
-    maxHeight:"100px",
+    maxHeight:"80px",
   },
   iconWeather:{
     minHeight:"110px"
