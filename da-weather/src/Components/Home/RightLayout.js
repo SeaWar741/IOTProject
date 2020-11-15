@@ -45,6 +45,7 @@ const RightLayout = ({ classes }) => {
   const [showTrafficButton, setShowTrafficButton] = useState(true);
   const [themeMap,setThemeMap] = useState('mapbox://styles/mapbox/light-v9')
   const [hourStatus,setHourEnabled] = useState(false)
+  const [pointStatus, setPointStatus] = useState(false);
 
   const toggleTraffic = () => setShowTraffic(showTraffic);
   const toggleButton = () => setShowTrafficButton(showTrafficButton);
@@ -52,22 +53,21 @@ const RightLayout = ({ classes }) => {
 
   useEffect (()=>{
     //console.log("pass");
-    function fetchData(){
-      for (var i = 1; i <= 1; i++) {
-        
-        //console.log(firebase.database().ref("iotproject-446e7/"));
-        //console.log("locations",locations);
-        firebase.database().ref(i).on("value", resp => {
-          let datas = {
-            Latitude: resp.val().GPS.Latitude,
-            Longitude: resp.val().GPS.Longitude,
-            ID: resp.val().SensorID
-          };
-          console.log("datas",datas);
-          addPoint(datas);
-        })
-      }      
-    }
+    
+    async function fetchData(){
+      const nodess = await firebase.database().ref("Nodes");
+      nodess.on("value", resp => {
+        let nodes = resp.val();
+          nodes.map(node => {
+            let marker = {
+              Latitude: node.GPS.Latitude,
+              Longitude: node.GPS.Longitude,
+              ID: node.SensorID
+            }
+            addPoint(marker);
+          })
+      })
+      }   
     fetchData()
   },[]);  
   
@@ -114,22 +114,21 @@ const RightLayout = ({ classes }) => {
           }
       }]
     };
-    console.log("117", newPoint1);
-    console.log("118", points.features);
     const newFeatures = points.features.concat(newPoint1.features);
-    console.log("120", newFeatures);
     const newPoints = { ...points, features: newFeatures };
-    console.log("122",newPoints);
     setPoints(newPoints);
-    console.log("124",points);
+    if(points.features.length >= 4){
+      setPointStatus(true);
+    }
+    console.log("features length", points.features.length)
   }
 
   const markerOnClick = (event) => {
     //console.log(event.features[0].properties.ID);
     //setSelectedStation(event.features[0].properties.ID);
     dispatch({
-      type:"SET_ID",
-      ID:event.features[0].properties.ID
+      type: "SET_ID",
+      ID: event.features[0].properties.ID
     });
   };
 
@@ -149,51 +148,56 @@ const RightLayout = ({ classes }) => {
 
   return (
     <div className={classes.Main}>
-        <MapGL
-            style={{ width: '100%', minHeight: '100vh' }}
-            mapStyle={themeMap}
-            accessToken= {process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
-            latitude={viewport.latitude}
-            longitude={viewport.longitude}
-            zoom={viewport.zoom}
-            onViewportChange={setViewport}
-            
-        >
-            <GeolocateControl position='top-right' />
-            <NavigationControl showCompass showZoom position='top-right' />
-            <Source id='points' type='geojson' data={points} />
-            <Image id='my-image' image={"./img/mapPointer.png"} className={classes.mapPoint}/>
-            <Layer
-              id='points'
-              type='circle'
-              source='points'
-              paint={{
-                'circle-radius': 6,
-                'circle-color': '#1978c8'
-              }}
-              /*
-              id='points'
-              type='symbol'
-              source='points'
-              layout={{
-                'icon-image': 'my-image',
-                'icon-size': 0.25
-              }}
-              */
-              onClick={markerOnClick}
-            />
-            <Layer
-              id='pointss'
-              type='symbol'
-              source='points'
-              layout={{
-                'icon-image': 'my-image',
-                'icon-size': 0.25
-              }}
-              onClick={markerOnClick}
-            />
-            <TrafficControl showTraffic={showTraffic} showTrafficButton={showTrafficButton} />
-        </MapGL>
+        {pointStatus ? (
+            <MapGL
+                style={{ width: '100%', minHeight: '100vh' }}
+                mapStyle={themeMap}
+                accessToken= {process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
+                latitude={viewport.latitude}
+                longitude={viewport.longitude}
+                zoom={viewport.zoom}
+                onViewportChange={setViewport}
+                
+            >
+                <GeolocateControl position='top-right' />
+                <NavigationControl showCompass showZoom position='top-right' />
+                <Source id='points' type='geojson' data={points} />
+                <Image id='my-image' image={"./img/mapPointer.png"} className={classes.mapPoint}/>
+                <Layer
+                  id='points'
+                  type='circle'
+                  source='points'
+                  paint={{
+                    'circle-radius': 6,
+                    'circle-color': '#1978c8'
+                  }}
+                  /*
+                  id='points'
+                  type='symbol'
+                  source='points'
+                  layout={{
+                    'icon-image': 'my-image',
+                    'icon-size': 0.25
+                  }}
+                  */
+                  onClick={markerOnClick}
+                />
+                <Layer
+                  id='pointss'
+                  type='symbol'
+                  source='points'
+                  layout={{
+                    'icon-image': 'my-image',
+                    'icon-size': 0.25
+                  }}
+                  onClick={markerOnClick}
+                />
+                <TrafficControl showTraffic={showTraffic} showTrafficButton={showTrafficButton} />
+            </MapGL>
+        ) : (
+          <div><h1>Mapa debe ir aquí</h1></div>
+        )}
+        
     </div>
   );
 };
