@@ -19,7 +19,7 @@ FirebaseJson json;
 int n = 0;
 
 //Replace with Station ID
-String path = "/1/"; //<--Cambiar por el ID correspondiente
+String path = "/Nodes/1/"; //<--Cambiar por el ID correspondiente
 
 //GPS API Google
 //Credentials for Google GeoLocation API...
@@ -214,7 +214,7 @@ void loop(){
   int potenciometro = 0;
   //double velocidad = 0;
   //String specialSensorTitle = "";
-  double specialSensorReading = 0;
+  int specialSensorReading = 0;
 
   
   // Sending the request
@@ -293,7 +293,13 @@ void loop(){
     Firebase.setDouble(firebaseData, path + "GPS/Accuracy",accuracy);
   
     Firebase.setString(firebaseData, path + "SpecialSensor/specialSensorTitle",specialSensorTitle);
-    Firebase.setDouble(firebaseData, path + "SpecialSensor/SpecialSensorReading",specialSensorReading);
+    if(specialSensorReading == 1){
+      Firebase.setString(firebaseData, path + "SpecialSensor/SpecialSensorReading","Earthquake");
+    }
+    if(specialSensorReading == 0){
+      Firebase.setString(firebaseData, path + "SpecialSensor/SpecialSensorReading","No activity");
+    }
+    
     //delay(150000);
 }
 
@@ -320,7 +326,7 @@ void handleIndex(){
   int potenciometro = 0;
   double velocidad = 0;
   //String specialSensorTitle = "";
-  double specialSensorReading = 0;
+  int specialSensorReading = 0;
 
   
   // Sending the request
@@ -399,7 +405,12 @@ void handleIndex(){
   Firebase.setDouble(firebaseData, path + "GPS/Accuracy",accuracy);
 
   Firebase.setString(firebaseData, path + "SpecialSensor/specialSensorTitle",specialSensorTitle);
-  Firebase.setDouble(firebaseData, path + "SpecialSensor/SpecialSensorReading",specialSensorReading);
+  if(specialSensorReading == 1){
+     Firebase.setString(firebaseData, path + "SpecialSensor/SpecialSensorReading","Earthquake");
+  }
+  if(specialSensorReading == 0){
+     Firebase.setString(firebaseData, path + "SpecialSensor/SpecialSensorReading","No activity");
+  }
 
   // Prepare the data for serving it over HTTP
   String output = "SensorID: " +String(sensorID)+ "\n";

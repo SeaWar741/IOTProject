@@ -19,7 +19,7 @@ FirebaseJson json;
 int n = 0;
 
 //Replace with Station ID
-String path = "/3/"; //<--Cambiar por el ID correspondiente
+String path = "/Nodes/3/"; //<--Cambiar por el ID correspondiente
 
 //GPS API Google
 //Credentials for Google GeoLocation API...
@@ -56,7 +56,7 @@ void setup(){
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
   Firebase.reconnectWiFi(true);
 
-  server.on("/",handleIndex);
+  //server.on("/",handleIndex);
   server.begin();
 
   //---------------------GPS GET-------------------------------------

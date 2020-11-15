@@ -19,7 +19,7 @@ FirebaseJson json;
 int n = 0;
 
 //Replace with Station ID
-String path = "/4/"; //<--Cambiar por el ID correspondiente
+String path = "/Nodes/4/"; //<--Cambiar por el ID correspondiente
 
 //GPS API Google
 //Credentials for Google GeoLocation API...
