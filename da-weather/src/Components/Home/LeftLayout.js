@@ -108,7 +108,7 @@ const LeftLayout = ({ classes }) => {
     async function fetchData(){
         console.log("fetching data..")
         console.log("id", ID)
-        const query = await firebase.database().ref("Nodes").orderByKey().once("value").then(function(snapshot){
+        const query = await firebase.database().ref("Nodes").orderByKey().on('value', function(snapshot) {
             var data = snapshot.child(ID).val()
             console.log("left  datas", data)
 
