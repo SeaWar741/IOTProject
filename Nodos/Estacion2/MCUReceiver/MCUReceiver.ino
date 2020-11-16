@@ -6,6 +6,8 @@
 #include <ArduinoJson.h>
 
 ESP8266WebServer server;
+//char* ssid = "ARRIS-99C2";
+//char* password = "4AC9DC9A1D1A1147";
 char* ssid = "iPhone abraham";
 char* password = "12345677";
 

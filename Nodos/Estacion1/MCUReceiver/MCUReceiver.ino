@@ -6,8 +6,8 @@
 #include <ArduinoJson.h>
 
 ESP8266WebServer server;
-char* ssid = "Note 10+ Juan Carlos";
-char* password = "Juan2000";
+char* ssid = "iPhone abraham";
+char* password = "12345677";
 
 //FIREBASE
 #define FIREBASE_HOST "iotproject-446e7.firebaseio.com"

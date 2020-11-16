@@ -1,5 +1,6 @@
 #include "DHT.h"
 #include <ArduinoJson.h>
+#include "LiquidCrystal.h"
 
 String message = "";//json
 bool messageReady = false;
@@ -13,6 +14,9 @@ DHT dht(5, DHT11);
 
 //Luz
 const int lightSensor = A0;
+
+//LCD display
+LiquidCrystal lcd(8,9,4,5,6,7);
 
 //Acelerometro
 const int xpin = A1; // x-axis of the accelerometer
@@ -108,12 +112,36 @@ void setup() {
   pinMode(redPin, OUTPUT);
   pinMode(greenPin, OUTPUT);
   pinMode(bluePin, OUTPUT);
+
+
+  //LCD display
+  lcd.begin(16,2);
+
+  lcd.setCursor(0,0);
+  //text to print
+  lcd.print("    COUNTER");
+  delay(100);
+  
+  int a=0;
+  lcd.setCursor(0,1);
+  lcd.print("       ");
+  lcd.print(a);
+  while(a<=100){
+    a=a+1;
+    delay(1000);
+    lcd.setCursor(0,1);
+    lcd.print("       ");
+    lcd.print(a);
+  }
 }
 
 void loop() {
   // ESPERAR ENTRE MEDICIONES, NECESARIO PARA EL BUEN FUNCIONAMIENTO
   delay(2000);
 
+  //LCD Display
+  lcd.clear();
+  
   //LUZ
   lightVal = analogRead(lightSensor);
 
