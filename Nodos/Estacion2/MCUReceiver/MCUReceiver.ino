@@ -6,10 +6,10 @@
 #include <ArduinoJson.h>
 
 ESP8266WebServer server;
-//char* ssid = "ARRIS-99C2";
-//char* password = "4AC9DC9A1D1A1147";
-char* ssid = "iPhone abraham";
-char* password = "12345677";
+char* ssid = "ARRIS-99C2";
+char* password = "4AC9DC9A1D1A1147";
+//char* ssid = "iPhone abraham";
+//char* password = "12345677";
 
 //FIREBASE
 #define FIREBASE_HOST "iotproject-446e7.firebaseio.com"
@@ -216,7 +216,7 @@ void loop(){
   int potenciometro = 0;
   //double velocidad = 0;
   //String specialSensorTitle = "";
-  double specialSensorReading = 0;
+  int specialSensorReading = 0;
 
   
   // Sending the request
@@ -295,7 +295,11 @@ void loop(){
     Firebase.setDouble(firebaseData, path + "GPS/Accuracy",accuracy);
   
     Firebase.setString(firebaseData, path + "SpecialSensor/specialSensorTitle",specialSensorTitle);
-    Firebase.setDouble(firebaseData, path + "SpecialSensor/SpecialSensorReading",specialSensorReading);
+    if(specialSensorReading == 1){
+       Firebase.setString(firebaseData, path + "SpecialSensor/SpecialSensorReading","Huracane");
+    } else{
+      Firebase.setString(firebaseData, path + "SpecialSensor/SpecialSensorReading", "No huracane");
+    }
     //delay(150000);
 }
 
@@ -401,7 +405,11 @@ void handleIndex(){
   Firebase.setDouble(firebaseData, path + "GPS/Accuracy",accuracy);
 
   Firebase.setString(firebaseData, path + "SpecialSensor/specialSensorTitle",specialSensorTitle);
-  Firebase.setDouble(firebaseData, path + "SpecialSensor/SpecialSensorReading",specialSensorReading);
+  if(specialSensorReading == 1){
+     Firebase.setString(firebaseData, path + "SpecialSensor/SpecialSensorReading","Huracane");
+  } else{
+    Firebase.setString(firebaseData, path + "SpecialSensor/SpecialSensorReading", "No huracane");
+  }
 
   // Prepare the data for serving it over HTTP
   String output = "SensorID: " +String(sensorID)+ "\n";

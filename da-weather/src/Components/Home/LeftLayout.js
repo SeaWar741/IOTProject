@@ -108,31 +108,9 @@ const LeftLayout = ({ classes }) => {
     async function fetchData(){
         console.log("fetching data..")
         console.log("id", ID)
-        const query = await firebase.database().ref("Nodes").orderByKey().once("value").then(function(snapshot){
-            var data = snapshot.child(ID).val()
-            console.log("left  datas", data)
-
-            let datas = {
-                ADC_MQ: data.ADC_MQ,
-                Concentracion: data.Concentracion.toFixed(3),
-                Humedad: data.Humedad,
-                Lluvia:data.Lluvia,
-                Luz:data.Luz,
-                Potenciometro:data.Potenciometro,
-                Rs:data.Rs,
-                SensorID: data.SensorID,
-                Sonido:data.Sonido,
-                Temperatura:data.Temperatura.toFixed(1),
-                TemperaturaRel:data.SensacionTermica.toFixed(1),
-                X:data.X.toFixed(3),
-                Y:data.Y,
-                Z:data.Z,
-                Velocidad:data.Velocidad,
-                Latitude: data.GPS.Latitude,
-                Longitude: data.GPS.Longitude,
-                SpecialSensorReading: data.SpecialSensor.SpecialSensorReading,
-                SpecialSensorTitle: data.SpecialSensor.specialSensorTitle,
-            };
+       /*  const query = await firebase.database().ref("Nodes").orderByKey().once("value").then(function(snapshot){
+            var datas = snapshot.child(ID).val()
+            console.log("left  datas", datas)
 
             const hours = new Date().getHours();
             const isDayTime = hours > 6 && hours < 20;
@@ -181,7 +159,85 @@ const LeftLayout = ({ classes }) => {
             
             setData(datas);
             setDataStatus(true);
-        });
+        }); */
+        firebase.database().ref("Nodes/"+ID).on("value",resp=>{
+            //console.log(snapshot.val().Temperatura);
+            console.log("firebaseID", ID)
+            let datas = {
+                ADC_MQ: resp.val().ADC_MQ,
+                Concentracion: resp.val().Concentracion.toFixed(3),
+                Humedad: resp.val().Humedad,
+                Lluvia:resp.val().Lluvia,
+                Luz:resp.val().Luz,
+                Potenciometro:resp.val().Potenciometro,
+                Rs:resp.val().Rs,
+                SensorID: resp.val().SensorID,
+                Sonido:resp.val().Sonido,
+                Temperatura:resp.val().Temperatura.toFixed(1),
+                TemperaturaRel:resp.val().SensacionTermica.toFixed(1),
+                X:resp.val().X.toFixed(3),
+                Y:resp.val().Y,
+                Z:resp.val().Z,
+                Velocidad:resp.val().Velocidad,
+                Latitude: resp.val().GPS.Latitude,
+                Longitude: resp.val().GPS.Longitude,
+                SpecialSensorReading: resp.val().SpecialSensor.SpecialSensorReading,
+                SpecialSensorTitle: resp.val().SpecialSensor.specialSensorTitle,
+            };
+            
+            const hours = new Date().getHours();
+            const isDayTime = hours > 6 && hours < 20;
+
+            /* const fetchUrl = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+datas.Latitude+","+datas.Longitude+"&key="+process.env.REACT_APP_APIKEY_GEOCODING;
+            const newRequest = await axios.get(fetchUrl);
+            console.log(newRequest);
+            setCityLocation(newRequest.data.results); */
+            
+            if(datas.Temperatura >= 25 && datas.Luz <= 5 && datas.Humedad >=40){
+                setIcon("./img/iconsWeather/Haze.png");
+                isDayTime ? setBackground("./img/background/Cloudy.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            else if(datas.Temperatura <= 0 && datas.Humedad >=40 ){
+                setIcon("./img/iconsWeather/Blizzard.png");
+                isDayTime ? setBackground("./img/background/Cold.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            else if(datas.Lluvia === "Raining" && datas.Humedad >= 80 && datas.Lluvia === "Raining"){
+                setIcon("./img/iconsWeather/Drizzle.png");
+                isDayTime ? setBackground("./img/background/Rainy.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            else if(datas.Luz <= 5 && datas.Humedad >=70 && datas.Lluvia === "Not Raining"){
+                setIcon("./img/iconsWeather/Fog.png");
+                isDayTime ? setBackground("./img/background/Rainy.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            else if(datas.Lluvia === "Flood" && datas.X >= 10 && datas.Sonido >=10){
+                setIcon("./img/iconsWeather/SevereThunderstorm.png");
+                isDayTime ? setBackground("./img/background/ThunderStorm.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            else if(datas.Lluvia === "Flood" && datas.X >= 10 && datas.Sonido >=10){
+                setIcon("./img/iconsWeather/HeavyRain.png");
+                isDayTime ? setBackground("./img/background/TunderStorm.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            else if(datas.Temperatura >=25 && datas.Luz >= 5){
+                setIcon("./img/iconsWeather/MostlySunny.png");
+                isDayTime ? setBackground("./img/background/Sunny.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            else if(datas.Luz >=5 && datas.Temperatura >= 20 && datas.Temperatura <=25){
+                setIcon("./img/iconsWeather/MostlySunny.png");
+                isDayTime ? setBackground("./img/background/Good.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            else if(datas.Lluvia === "Raining"){
+                setIcon("./img/iconsWeather/Rain.png");
+                isDayTime ? setBackground("./img/background/Rainy.jpg") : setBackground("./img/background/Night.jpg");
+            }
+            else{
+                setIcon("./img/iconsWeather/PartyCloudy.png");
+                isDayTime ? setBackground("./img/background/Cloudy.jpg") : setBackground("./img/background/Night.jpg");
+                isDayTime ? setBackgroundColor('"rgba(255, 255, 255, .6)"') : setBackgroundColor('"rgba(0, 0, 0, .6)"');
+            }
+            
+            setData(datas);
+            setDataStatus(true);
+        })
     }
     fetchData();
     

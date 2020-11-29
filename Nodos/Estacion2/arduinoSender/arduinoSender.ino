@@ -15,9 +15,6 @@ DHT dht(5, DHT11);
 //Luz
 const int lightSensor = A0;
 
-//LCD display
-LiquidCrystal lcd(8,9,4,5,6,7);
-
 //Acelerometro
 const int xpin = A1; // x-axis of the accelerometer
 const int ypin = A2; // y-axis
@@ -53,6 +50,8 @@ int yP = 0;
 //ejemplo:
 //const int especialMotor = A12;
 //const int especialMotor = 12;
+int motorPin = 3;
+
  
 
 //Variables globales 
@@ -84,19 +83,45 @@ float toThree(double x){
 
 String getSpeed(int x, int y){
   String velocity = "";
-  if(x != xP){
-    if(y>yP*10){
-      velocity = "High wind speed";
-    }
-    else{
-      velocity = "Moderate wind speed";
-    }
-  }
-  else{
+  //Serial.print("xP: ");
+  //Serial.println(xP);
+  //Serial.print("x: ");
+  //Serial.println(x);
+  //Serial.print("yP: ");
+  //Serial.println(yP);
+  /*Serial.print("y: ");
+  Serial.println(y);*/
+  if(xP == 0 & yP == 0){
     velocity = "No wind speed";
+  } else{
+    if(x != xP){
+      if((y-yP) > 100){
+        velocity = "High wind speed";
+      } else{
+        velocity = "Moderate wind speed";
+      }
+    } else{
+      velocity = "No wind speed";
+    }
   }
+  
   return velocity;
 }
+
+
+void closeDoor(){
+  //Serial.println("closing door..");
+  for(int k = 0; k <= 155; k+=10){
+    analogWrite(motorPin, k);
+    delay(200);
+  }
+  for(int k = 150; k >= 0; k-=10){
+    analogWrite(motorPin, k);
+    delay(200);
+  }
+  analogWrite(motorPin, 0);
+}
+
 
 
 void setup() {
@@ -113,34 +138,15 @@ void setup() {
   pinMode(greenPin, OUTPUT);
   pinMode(bluePin, OUTPUT);
 
-
-  //LCD display
-  lcd.begin(16,2);
-
-  lcd.setCursor(0,0);
-  //text to print
-  lcd.print("    COUNTER");
-  delay(100);
-  
-  int a=0;
-  lcd.setCursor(0,1);
-  lcd.print("       ");
-  lcd.print(a);
-  while(a<=100){
-    a=a+1;
-    delay(1000);
-    lcd.setCursor(0,1);
-    lcd.print("       ");
-    lcd.print(a);
-  }
+  // Motor PIN¡
+  pinMode(motorPin, OUTPUT);
 }
 
 void loop() {
   // ESPERAR ENTRE MEDICIONES, NECESARIO PARA EL BUEN FUNCIONAMIENTO
   delay(2000);
 
-  //LCD Display
-  lcd.clear();
+  //Serial.println("Going through loop...");
   
   //LUZ
   lightVal = analogRead(lightSensor);
@@ -161,6 +167,8 @@ void loop() {
         lluvia = "Not Raining";
         break;
    }
+
+  
   
   // LEER TEMPERATURA Y HUMEDAD
   float humedad = dht.readHumidity();
@@ -171,12 +179,18 @@ void loop() {
   float hiDegC = dht.convertFtoC(hi);
 
   // REVISAR QUE LOS RESULTADOS SEAN VALORES NUMERICOS VALIDOS, INDICANDO QUE LA COMUNICACION ES CORRECTA
-  
+
+  /*Serial.print("Humedad: ");
+  Serial.println(humedad);
+  Serial.print("Temperatura: ");
+  Serial.println(temperatura);*/
   if (isnan(humedad) || isnan(temperatura)) {
     //Serial.println("Falla al leer el sensor DHT11!");
-    return;
+    humedad = 50;
+    temperatura = 25;
   }
 
+  
   
 
   //GIROSCOPIO
@@ -185,7 +199,10 @@ void loop() {
   int z = analogRead(zpin); //read from zpin
   float zero_G = 512.0; //ADC is 0~1023 the zero g output equal to Vs/2
   float scale = 102.3; //ADXL335330 Sensitivity is 330mv/g
+  //Serial.println("Calculating velocity value...");
   String velocityValue = getSpeed(x,y);
+  //Serial.print("Velocity: ");
+  //Serial.println(velocityValue);
   xP = x;
   yP = y;
   //330 * 1024/3.3/1000
@@ -211,8 +228,21 @@ void loop() {
 
   //SENSOR ESPECIAL
   //Poner aqui el nombre de la variable y la lectura
-  float specialSensorReading = 0;
-
+  int specialSensorReading = 0;
+  /*if(velocityValue == "High wind speed" & lluvia == "Raining"){
+    closeDoor();
+    specialSensorReading = 1;
+  } else{
+    analogWrite(motorPin, 0);
+    specialSensorReading = 0;
+  }*/
+  if(velocityValue == "High wind speed"){
+    closeDoor();
+    specialSensorReading = 1;
+  } else{
+    analogWrite(motorPin, 0);
+    specialSensorReading = 0;
+  }
 
   //SERIAL VERIFICATION
   while(Serial.available()) {
@@ -285,7 +315,6 @@ void loop() {
 
       serializeJson(doc,Serial);
     }
-    
     messageReady = false;
   }
   
