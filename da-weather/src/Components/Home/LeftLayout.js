@@ -108,9 +108,9 @@ const LeftLayout = ({ classes }) => {
     async function fetchData(){
         console.log("fetching data..")
         console.log("id", ID)
-       /*  const query = await firebase.database().ref("Nodes").orderByKey().once("value").then(function(snapshot){
-            var datas = snapshot.child(ID).val()
-            console.log("left  datas", datas)
+        const query = await firebase.database().ref("Nodes").orderByKey().on('value', function(snapshot) {
+            var data = snapshot.child(ID).val()
+            console.log("left  datas", data)
 
             const hours = new Date().getHours();
             const isDayTime = hours > 6 && hours < 20;
