@@ -339,7 +339,6 @@ void loop(){
       int monthDay = ptm->tm_mday;
       int currentMonth = ptm->tm_mon+1;
       int currentYear = ptm->tm_year+1900;
-      Serial.println(epochTime); 
      
       String dateS = String(currentMonth) + "-" + String(monthDay) + "-" + String(currentYear);
       String subPath = "Data/" + String(epochTime);

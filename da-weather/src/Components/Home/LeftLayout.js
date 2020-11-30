@@ -165,7 +165,7 @@ const LeftLayout = ({ classes }) => {
             
             setData(datas);
             setDataStatus(true);
-        }); */
+        });
         firebase.database().ref("Nodes/"+ID).on("value",resp=>{
             //console.log(snapshot.val().Temperatura);
             console.log("firebaseID", ID)
