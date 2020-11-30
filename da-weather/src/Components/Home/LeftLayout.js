@@ -5,6 +5,10 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import {LocationMarker} from '@styled-icons/heroicons-solid/LocationMarker';
 import {Calendar} from '@styled-icons/boxicons-regular/Calendar';
+import Button from '@material-ui/core/Button';
+import TimelineIcon from '@material-ui/icons/Timeline';
+import { Link } from 'react-router-dom'
+
 import axios from "axios";
 import firebase from '../../Utils/Firebase';
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -82,6 +86,9 @@ const useStyles = makeStyles((theme) => ({
   headerText:{
       fontWeight:"bold",
       fontSize:"18px"
+  },
+  buttonChart:{
+      backgroundColor:"#0074A1 !important",
   }
 }));
 
@@ -89,8 +96,7 @@ const useStyles = makeStyles((theme) => ({
 const LeftLayout = ({ classes }) => {
   const [{ID}] = useDataLayerValue();
   //console.log(ID);
-
-
+  
   classes = useStyles();
 
   //const data = useData();
@@ -232,7 +238,7 @@ const LeftLayout = ({ classes }) => {
             else{
                 setIcon("./img/iconsWeather/PartyCloudy.png");
                 isDayTime ? setBackground("./img/background/Cloudy.jpg") : setBackground("./img/background/Night.jpg");
-                isDayTime ? setBackgroundColor('"rgba(255, 255, 255, .6)"') : setBackgroundColor('"rgba(0, 0, 0, .6)"');
+                isDayTime ? setBackgroundColor('"rgba(255, 255, 255, .6)" !important') : setBackgroundColor('"rgba(0, 0, 0, .6)" !important');
             }
             
             setData(datas);
@@ -298,7 +304,7 @@ const LeftLayout = ({ classes }) => {
                         </Paper>
                     </Grid>
                     <Grid item xs={6}>
-                        <Paper className={classes.paper} style={{background:backgroundColor}}>
+                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
                             <Image src="./img/iconsWeather/generic.png" className={classes.iconWeather} fluid/>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitle}>{data.SpecialSensorReading}</Card.Title>
@@ -311,7 +317,7 @@ const LeftLayout = ({ classes }) => {
                         </Paper>
                     </Grid>
                     <Grid item xs={3}>
-                        <Paper className={classes.paper} style={{background:backgroundColor}}>
+                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Humedad</Card.Title>
                                 <Card.Text>
@@ -331,7 +337,7 @@ const LeftLayout = ({ classes }) => {
                         </Paper>
                     </Grid>
                     <Grid item xs={3}>
-                        <Paper className={classes.paper} style={{background:backgroundColor}}>
+                        <Paper className={classes.paper} style={{backgroundColor:{backgroundColor}}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Sonido</Card.Title>
                                 <Card.Text>
@@ -341,7 +347,7 @@ const LeftLayout = ({ classes }) => {
                         </Paper>
                     </Grid>
                     <Grid item xs={3}>
-                        <Paper className={classes.paper} style={{background:backgroundColor}}>
+                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Temperatura</Card.Title>
                                 <Card.Text>
@@ -351,7 +357,7 @@ const LeftLayout = ({ classes }) => {
                         </Paper>
                     </Grid>
                     <Grid item xs={3}>
-                        <Paper className={classes.paper} style={{background:backgroundColor}}>
+                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>CO2</Card.Title>
                                 <Card.Text>
@@ -361,7 +367,7 @@ const LeftLayout = ({ classes }) => {
                         </Paper>
                     </Grid>
                     <Grid item xs={3}>
-                        <Paper className={classes.paper} style={{background:backgroundColor}}>
+                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Lluvia</Card.Title>
                                 <Card.Text>
@@ -371,7 +377,7 @@ const LeftLayout = ({ classes }) => {
                         </Paper>
                     </Grid>
                     <Grid item xs={3}>
-                        <Paper className={classes.paper} style={{background:backgroundColor}}>
+                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Viento</Card.Title>
                                 <Card.Text>
@@ -381,11 +387,19 @@ const LeftLayout = ({ classes }) => {
                         </Paper>
                     </Grid>
                     <Grid item xs={3}>
-                        <Paper className={classes.paper} style={{background:backgroundColor}}>
+                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
-                                <Card.Title className={classes.cardTitleMini}>RS</Card.Title>
+                                <Card.Title className={classes.cardTitleMini}>Gráficas</Card.Title>   
                                 <Card.Text>
-                                    {data.Rs}
+                                    <Button
+                                        className={classes.buttonChart}
+                                        component={Link} to="/historico"
+                                        variant="contained"
+                                        color="primary"
+                                        startIcon={<TimelineIcon/>}
+                                    >
+                                    Acceder
+                                    </Button>
                                 </Card.Text>
                             </Card.Body>
                         </Paper>
