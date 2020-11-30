@@ -53,14 +53,14 @@ regressor.add(Dropout(0.2))
 regressor.add(Dense(units = n_future, activation='relu'))
 
 regressor.compile(
-    optimizer='adam', 
-    loss='mean_squared_error', 
+    optimizer='adam',
+    loss='mean_squared_error',
     metrics=['acc']
 )
 regressor.fit(
-    x_train, 
-    y_train, 
-    epochs=EPOCHS, 
+    x_train,
+    y_train,
+    epochs=EPOCHS,
     batch_size=BATCH_SIZE
 )
 

@@ -4,10 +4,20 @@
 #include <ESP8266WebServer.h>
 #include "FirebaseESP8266.h"
 #include <ArduinoJson.h>
+// librerias a instalar para obtener fecha y hora
+#include <NTPClient.h> 
+#include <WiFiUdp.h>
 
 ESP8266WebServer server;
 char* ssid = "iPhone abraham";
 char* password = "12345677";
+
+//Time from NTP Server
+const long utcOffsetInSeconds = 3600;
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
+int minutes;
+int timePassed;
 
 //FIREBASE
 #define FIREBASE_HOST "iotproject-446e7.firebaseio.com"
@@ -186,11 +196,19 @@ void setup(){
   Serial.println();
   client.stop();
 
+  //Time client NTP server
+  timeClient.begin();
+  timeClient.setTimeOffset(0);
+  timeClient.update();
+  minutes = timeClient.getMinutes();
 }
 
 void loop(){
   server.handleClient();
   delay(2000);
+
+  //Time Client NTP Server
+  timeClient.update();
   
   //----------------------CALL DATA FROM ARDUINO----------------------
   // Send a JSON-formatted request with key "type" and value "request"
@@ -301,6 +319,51 @@ void loop(){
     }
     
     //delay(150000);
+
+    timePassed = abs(timeClient.getMinutes() - minutes);
+    // se cumple cada 5 minutos
+    if(timePassed > 5){
+      //Get a time structure
+      unsigned long epochTime = timeClient.getEpochTime();
+      struct tm *ptm = gmtime ((time_t *)&epochTime); 
+      int monthDay = ptm->tm_mday;
+      int currentMonth = ptm->tm_mon+1;
+      int currentYear = ptm->tm_year+1900;
+      Serial.println(epochTime); 
+     
+      String dateS = String(currentMonth) + "-" + String(monthDay) + "-" + String(currentYear);
+      String subPath = "Data/" + String(epochTime);
+      Firebase.setString(firebaseData, path + subPath + "/Date",dateS);
+      Firebase.pushDouble(firebaseData, path + subPath + "/Humedad",humedad);
+      Firebase.pushDouble(firebaseData, path + subPath + "/Temperatura",temperatura);
+      Firebase.pushDouble(firebaseData, path + subPath + "/SensacionTermica",sensacionTermica);
+      Firebase.pushDouble(firebaseData, path + subPath + "/Luz",luz);
+      Firebase.pushDouble(firebaseData, path + subPath + "/X",x);
+      Firebase.pushDouble(firebaseData, path + subPath + "/Y",y);
+      Firebase.pushDouble(firebaseData, path + subPath + "/Z",z);
+      Firebase.pushDouble(firebaseData, path + subPath + "/Sonido",sonido);
+      Firebase.pushString(firebaseData, path + subPath + "/Lluvia",lluvia);
+      Firebase.pushDouble(firebaseData, path + subPath + "/ADC_MQ",adc_MQ);
+      Firebase.pushDouble(firebaseData, path + subPath + "/Voltaje",voltaje);
+      Firebase.pushDouble(firebaseData, path + subPath + "/Rs",Rs);
+      Firebase.pushDouble(firebaseData, path + subPath + "/Concentracion",concentracion);
+      Firebase.pushInt(firebaseData, path + subPath + "/Potenciometro",potenciometro);
+      Firebase.pushString(firebaseData, path + subPath + "/Velocidad",velocidad);
+    
+      Firebase.pushDouble(firebaseData, path + subPath + "/GPS/Latitude",latitude);
+      Firebase.pushDouble(firebaseData, path + subPath + "/GPS/Longitude",longitude);
+      Firebase.pushDouble(firebaseData, path + subPath + "/GPS/Accuracy",accuracy);
+ 
+      Firebase.setString(firebaseData, path + subPath + "/SpecialSensor/specialSensorTitle",specialSensorTitle);
+      if(specialSensorReading == 1){
+        Firebase.pushString(firebaseData, path + subPath + "/SpecialSensor/SpecialSensorReading","Earthquake");
+      }
+      if(specialSensorReading == 0){
+        Firebase.pushString(firebaseData, path + subPath + "/SpecialSensor/SpecialSensorReading","No activity");
+      }
+        
+      minutes = timeClient.getMinutes();
+    }
 }
 
 void handleIndex(){
