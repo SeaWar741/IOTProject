@@ -1,6 +1,6 @@
 import React, { useEffect, useState} from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import {Image,Card } from 'react-bootstrap'
+import {Image,Card } from 'react-bootstrap';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import {LocationMarker} from '@styled-icons/heroicons-solid/LocationMarker';
@@ -104,7 +104,7 @@ const LeftLayout = ({ classes }) => {
   const [data,setData] = useState({});
   const [icon,setIcon] = useState("./img/iconsWeather/MostlySunny.png");
   const [background,setBackground] = useState("./img/background/Good.jpg");
-  const [cityLocation, setCityLocation] = useState("");
+  const [cityLocation, setCityLocation] = useState("MTY");
   const [dataStatus, setDataStatus] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState('"rgba(255, 255, 255, .6)"'); //<--Para dark mode
   
@@ -116,7 +116,7 @@ const LeftLayout = ({ classes }) => {
         console.log("id", ID)
         const query = await firebase.database().ref("Nodes").orderByKey().on('value', function(snapshot) {
             var data = snapshot.child(ID).val()
-            console.log("left  datas", data)
+            //console.log("left  datas", data)
 
             let datas = {
                 ADC_MQ: data.ADC_MQ,
@@ -202,7 +202,7 @@ const LeftLayout = ({ classes }) => {
         }
     }
     
-    fetchLocation();
+    //fetchLocation();
 
 
   //Temporal

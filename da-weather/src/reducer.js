@@ -1,6 +1,4 @@
 export const initialState = {
-  /* request: `/trending/all/week?api_key=${API_KEY}&language=en-US`, */
-  /* title: "Trending now", */
   ID: "1"
 };
 

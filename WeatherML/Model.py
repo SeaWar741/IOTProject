@@ -39,8 +39,8 @@ x_train = np.reshape(x_train, (x_train.shape[0] , x_train.shape[1], 1))
 
 
 #LSTM
-EPOCHS = 500
-BATCH_SIZE = 32
+EPOCHS = 20
+BATCH_SIZE = 64
 regressor = Sequential()
 regressor.add(Bidirectional(LSTM(units=30, return_sequences=True, input_shape = (x_train.shape[1], 1))))
 regressor.add(Dropout(0.2))
@@ -53,14 +53,14 @@ regressor.add(Dropout(0.2))
 regressor.add(Dense(units = n_future, activation='relu'))
 
 regressor.compile(
-    optimizer='adam', 
-    loss='mean_squared_error', 
+    optimizer='adam',
+    loss='mean_squared_error',
     metrics=['acc']
 )
 regressor.fit(
-    x_train, 
-    y_train, 
-    epochs=EPOCHS, 
+    x_train,
+    y_train,
+    epochs=EPOCHS,
     batch_size=BATCH_SIZE
 )
 

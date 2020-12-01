@@ -4,12 +4,22 @@
 #include <ESP8266WebServer.h>
 #include "FirebaseESP8266.h"
 #include <ArduinoJson.h>
+// librerias a instalar para obtener fecha y hora
+#include <NTPClient.h> 
+#include <WiFiUdp.h>
 
 ESP8266WebServer server;
-//char* ssid = "ARRIS-99C2";
-//char* password = "4AC9DC9A1D1A1147";
-char* ssid = "iPhone abraham";
-char* password = "12345677";
+char* ssid = "ARRIS-99C2";
+char* password = "4AC9DC9A1D1A1147";
+//char* ssid = "iPhone abraham";
+//char* password = "12345677";
+
+//Time from NTP Server
+const long utcOffsetInSeconds = 3600;
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
+int minutes;
+int timePassed;
 
 //FIREBASE
 #define FIREBASE_HOST "iotproject-446e7.firebaseio.com"
@@ -44,6 +54,16 @@ int more_text = 1; // set to 1 for more debug output
 
 const size_t capacity = JSON_OBJECT_SIZE(20) + 230;
 
+
+boolean inArray(int array[], int element) {
+ for (int i = 0; i < 5; i++) {
+      if (array[i] == element) {
+          return true;
+      }
+    }
+  return false;
+ }
+
 void setup(){
   WiFi.begin(ssid,password);
   Serial.begin(9600);
@@ -58,7 +78,7 @@ void setup(){
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
   Firebase.reconnectWiFi(true);
 
-  server.on("/",handleIndex);
+  //erver.on("/",handleIndex);
   server.begin();
 
   //---------------------GPS GET-------------------------------------
@@ -188,11 +208,19 @@ void setup(){
   Serial.println();
   client.stop();
 
+  //Time client NTP server
+  timeClient.begin();
+  timeClient.setTimeOffset(0);
+  timeClient.update();
+  minutes = timeClient.getMinutes();
 }
 
 void loop(){
   server.handleClient();
   delay(2000);
+
+  //Time Client NTP Server
+  timeClient.update();
   
   //----------------------CALL DATA FROM ARDUINO----------------------
   // Send a JSON-formatted request with key "type" and value "request"
@@ -216,7 +244,7 @@ void loop(){
   int potenciometro = 0;
   //double velocidad = 0;
   //String specialSensorTitle = "";
-  double specialSensorReading = 0;
+  int specialSensorReading = 0;
 
   
   // Sending the request
@@ -295,132 +323,52 @@ void loop(){
     Firebase.setDouble(firebaseData, path + "GPS/Accuracy",accuracy);
   
     Firebase.setString(firebaseData, path + "SpecialSensor/specialSensorTitle",specialSensorTitle);
-    Firebase.setDouble(firebaseData, path + "SpecialSensor/SpecialSensorReading",specialSensorReading);
-    //delay(150000);
-}
-
-void handleIndex(){
-  // Send a JSON-formatted request with key "type" and value "request"
-  // then parse the JSON-formatted response with keys "gas" and "distance"
-  const size_t capacity = JSON_OBJECT_SIZE(20) + 230;
-  DynamicJsonDocument doc(capacity);
-
-  int sensorID = 0;
-  double humedad = 0;
-  double temperatura = 0;
-  double sensacionTermica = 0;
-  double luz = 0;
-  double x = 0;
-  double y = 0;
-  double z = 0;
-  double sonido = 0;
-  //String lluvia = "";
-  double adc_MQ = 0;
-  double voltaje = 0;
-  double Rs = 0;
-  double concentracion = 0;
-  int potenciometro = 0;
-  double velocidad = 0;
-  //String specialSensorTitle = "";
-  double specialSensorReading = 0;
-
-  
-  // Sending the request
-  doc["type"] = "request";
-
-  //Get led color
-  if(Firebase.getInt(firebaseData, path + "Led")){
-    Serial.println(firebaseData.stringData());
-    doc["Led"] = firebaseData.intData();
-  }
-  serializeJson(doc,Serial);
-  
-  
-  // Reading the response
-  boolean messageReady = false;
-  String message = "";
-  while(messageReady == false) { // blocking but that's ok
-    if(Serial.available()) {
-      
-      message = Serial.readString();
-      Serial.print("LO RECIBIDO: ");
-      Serial.println(message);
-      messageReady = true;
+    if(specialSensorReading == 1){
+       Firebase.setString(firebaseData, path + "SpecialSensor/SpecialSensorReading","Huracane");
+    } else{
+      Firebase.setString(firebaseData, path + "SpecialSensor/SpecialSensorReading", "No huracane");
     }
-  }
-  // Attempt to deserialize the JSON-formatted message
-  DeserializationError error = deserializeJson(doc,message);
-  if(error) {
-    Serial.print(F("deserializeJson() failed: "));
-    Serial.println(error.c_str());
-    return;
-  }
-  
+    //delay(150000);
 
-  sensorID = doc["SensorID"];
-  humedad = doc["Humedad"];
-  temperatura = doc["Temperatura"];
-  sensacionTermica = doc["SensacionTermica"];
-  luz = doc["Luz"];
-  x = doc["X"];
-  y = doc["Y"];
-  z = doc["Z"];
-  sonido = doc["Sonido"];
-  String lluvia = doc["Lluvia"];
-  adc_MQ = doc["adc"];
-  voltaje = doc["voltaje"];
-  Rs = doc["Rs"];
-  concentracion = doc["ConcentracionGas"];
-  potenciometro = doc["Potenciometro"];
-  velocidad = doc["Velocidad"];
-  String specialSensorTitle = doc["SensorEspecial"];
-  specialSensorReading = doc["SpecialSensorReading"];
-
-
-
-  //Write data to Firebase
-  Firebase.setInt(firebaseData,  path + "SensorID",sensorID);
-  Firebase.setDouble(firebaseData, path + "Humedad",humedad);
-  Firebase.setDouble(firebaseData, path + "Temperatura",temperatura);
-  Firebase.setDouble(firebaseData, path + "SensacionTermica",sensacionTermica);
-  Firebase.setDouble(firebaseData, path + "Luz",luz);
-  Firebase.setDouble(firebaseData, path + "X",x);
-  Firebase.setDouble(firebaseData, path + "Y",y);
-  Firebase.setDouble(firebaseData, path + "Z",z);
-  Firebase.setDouble(firebaseData, path + "Sonido",sonido);
-  Firebase.setString(firebaseData, path + "Lluvia",lluvia);
-  Firebase.setDouble(firebaseData, path + "ADC_MQ",adc_MQ);
-  Firebase.setDouble(firebaseData, path + "Voltaje",voltaje);
-  Firebase.setDouble(firebaseData, path + "Rs",Rs);
-  Firebase.setDouble(firebaseData, path + "Concentracion",concentracion);
-  Firebase.setInt(firebaseData, path + "Potenciometro",potenciometro);
-  Firebase.setDouble(firebaseData, path + "Velocidad",velocidad);
-
-  Firebase.setDouble(firebaseData, path + "GPS/Latitude",latitude);
-  Firebase.setDouble(firebaseData, path + "GPS/Longitude",longitude);
-  Firebase.setDouble(firebaseData, path + "GPS/Accuracy",accuracy);
-
-  Firebase.setString(firebaseData, path + "SpecialSensor/specialSensorTitle",specialSensorTitle);
-  Firebase.setDouble(firebaseData, path + "SpecialSensor/SpecialSensorReading",specialSensorReading);
-
-  // Prepare the data for serving it over HTTP
-  String output = "SensorID: " +String(sensorID)+ "\n";
-  output += "Humedad: " + String(humedad) + "\n";
-  output += "Temperatura: " + String(temperatura)+ "\n";
-  output += "SensacionTermica: " + String(sensacionTermica)+ "\n";
-  output += "Luz: " + String(luz)+ "\n";
-  output += "X: " + String(x)+ "\n";
-  output += "Y: " + String(y)+ "\n";
-  output += "Z: " + String(z)+ "\n";
-  output += "Sonido: " + String(sonido)+ "\n";
-  output += "Lluvia: " + String(lluvia)+ "\n";
-  output += "Adc_MQ: " + String(adc_MQ)+ "\n";
-  output += "Voltaje: " + String(voltaje)+ "\n";
-  output += "Rs: " + String(Rs)+ "\n";
-  output += "concentracion: " + String(concentracion)+ "\n";
-  output += "Potenciometro: " + String(potenciometro)+ "\n";
-  output += "SpecialSensorReading: " + String(specialSensorReading)+ "\n";
-  
-  //Serve the data as plain text, for example
-  server.send(200,"text/plain",output);
+    timePassed = abs(timeClient.getMinutes() - minutes);
+    
+    if(timePassed > 5){
+      //Get a time structure
+      unsigned long epochTime = timeClient.getEpochTime();
+      struct tm *ptm = gmtime ((time_t *)&epochTime); 
+      int monthDay = ptm->tm_mday;
+      int currentMonth = ptm->tm_mon+1;
+      int currentYear = ptm->tm_year+1900;
+     
+      String dateS = String(currentMonth) + "-" + String(monthDay) + "-" + String(currentYear);
+      String subPath = "Data/" + String(epochTime);
+      Firebase.setString(firebaseData, path + subPath + "/Date",dateS);
+      Firebase.pushDouble(firebaseData, path + subPath + "/Humedad",humedad);
+      Firebase.pushDouble(firebaseData, path + subPath + "/Temperatura",temperatura);
+      Firebase.pushDouble(firebaseData, path + subPath + "/SensacionTermica",sensacionTermica);
+      Firebase.pushDouble(firebaseData, path + subPath + "/Luz",luz);
+      Firebase.pushDouble(firebaseData, path + subPath + "/X",x);
+      Firebase.pushDouble(firebaseData, path + subPath + "/Y",y);
+      Firebase.pushDouble(firebaseData, path + subPath + "/Z",z);
+      Firebase.pushDouble(firebaseData, path + subPath + "/Sonido",sonido);
+      Firebase.pushString(firebaseData, path + subPath + "/Lluvia",lluvia);
+      Firebase.pushDouble(firebaseData, path + subPath + "/ADC_MQ",adc_MQ);
+      Firebase.pushDouble(firebaseData, path + subPath + "/Voltaje",voltaje);
+      Firebase.pushDouble(firebaseData, path + subPath + "/Rs",Rs);
+      Firebase.pushDouble(firebaseData, path + subPath + "/Concentracion",concentracion);
+      Firebase.pushInt(firebaseData, path + subPath + "/Potenciometro",potenciometro);
+      Firebase.pushString(firebaseData, path + subPath + "/Velocidad",velocidad);
+    
+      Firebase.pushDouble(firebaseData, path + subPath + "/GPS/Latitude",latitude);
+      Firebase.pushDouble(firebaseData, path + subPath + "/GPS/Longitude",longitude);
+      Firebase.pushDouble(firebaseData, path + subPath + "/GPS/Accuracy",accuracy);
+    
+      Firebase.setString(firebaseData, path + subPath + "/SpecialSensor/specialSensorTitle",specialSensorTitle);
+      if(specialSensorReading == 1){
+         Firebase.pushString(firebaseData, path + subPath + "/SpecialSensor/SpecialSensorReading","Huracane");
+      } else{
+        Firebase.pushString(firebaseData, path + subPath + "/SpecialSensor/SpecialSensorReading", "No huracane");
+      }
+      minutes = timeClient.getMinutes();
+    }
 }
