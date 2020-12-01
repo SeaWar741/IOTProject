@@ -19,6 +19,13 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
 int minutes;
 int timePassed;
 
+//Time from NTP Server
+const long utcOffsetInSeconds = 3600;
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
+int minutes;
+int timePassed;
+
 //FIREBASE
 #define FIREBASE_HOST "iotproject-446e7.firebaseio.com"
 #define FIREBASE_AUTH "JXR7HvjwY9ZXVjaqEYVWIEkalRKKyRddQBtmrzK6"
