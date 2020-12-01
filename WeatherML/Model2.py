@@ -137,7 +137,7 @@ pyplot.xlim([0,pyplot.xlim()[1]])
 pyplot.ylim([0,pyplot.ylim()[1]])
 pyplot.show()
 
-model.save('my_model.h5')
+model.save('my_model2.h5')
 
 import tensorflowjs as tfjs
 tfjs.converters.save_keras_model(model, "./")

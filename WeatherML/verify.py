@@ -90,17 +90,3 @@ test_X = test_X.reshape((test_X.shape[0], test_X.shape[2]))
 print(prediction)
 
 
-def forecast(model, batch_size, row):
-	X = row[0:-1]
-	X = X.reshape(1, 1, len(X))
-	yhat = model.predict(X, batch_size=batch_size)
-	return yhat[0,0]
-
-def forecast(model, batch_size, row):
-	X = row[0:-1]
-	X = X.reshape(1, 1, len(X))
-	yhat = model.predict(X, batch_size=batch_size)
-	return yhat[0,0]
-
-
-print(forecast(new_model,1,test_X[0]))
