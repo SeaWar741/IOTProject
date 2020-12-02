@@ -1,6 +1,6 @@
 import React, { useEffect, useState} from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import {Image,Card } from 'react-bootstrap';
+import {Image,Card, Row, Col } from 'react-bootstrap';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import {LocationMarker} from '@styled-icons/heroicons-solid/LocationMarker';
@@ -23,10 +23,11 @@ const useStyles = makeStyles((theme) => ({
     backgroundRepeat:"no-repeat",
     backgroundPosition:"center",
 
-    width:"100%",
-    minHeight:"100vh",
-    maxHeight:"100vh",
-    color:"white"
+    width: "100%",
+    minHeight: "100vh",
+    color: "white",
+    paddingTop: "20px",
+    paddingBottom: "20px"
   },
   imageTopContainer:{
     display: "block",
@@ -38,7 +39,10 @@ const useStyles = makeStyles((theme) => ({
     maxHeight:"80px",
   },
   iconWeather:{
-    minHeight:"110px"
+    minHeight:"110px",
+    [theme.breakpoints.down('576')]: {
+        minHeight: "70px"
+    }
   },
   paper: {
     padding: theme.spacing(2),
@@ -59,6 +63,13 @@ const useStyles = makeStyles((theme) => ({
     /* important */
     minHeight: "100%"
   },
+  item: {
+    padding: "1rem",
+    transition: "transform 450ms",
+    '&:hover': {
+        transform: "scale(1.02)"
+    }
+  },
   cardContainer:{
       padding:"1rem"
   },
@@ -66,8 +77,11 @@ const useStyles = makeStyles((theme) => ({
       paddingTop:"1rem",
   },
   cardTitle:{
-      fontWeight:"600",
-      fontSize:"4rem !important"
+      fontWeight: "600",
+      fontSize: "4rem !important",
+      [theme.breakpoints.down('576')]: {
+          fontSize: "3rem !important"
+      }
   },
   cardTitleMini:{
     fontWeight:"600",
@@ -82,6 +96,9 @@ const useStyles = makeStyles((theme) => ({
       fontWeight:"500",
       paddingTop:"10px",
       paddingBottom:"10px",
+      [theme.breakpoints.down('576')]: {
+          fontSize: "12px"
+      }
   },
   headerText:{
       fontWeight:"bold",
@@ -89,6 +106,33 @@ const useStyles = makeStyles((theme) => ({
   },
   buttonChart:{
       backgroundColor:"#0074A1 !important",
+      borderRadius: "15px",
+      transition: "transform 450ms",
+      [theme.breakpoints.up('1200')]: {
+          position: "relative",
+          fontSize: "12px",
+          left: "-1.8vw"
+      },
+      [theme.breakpoints.up('1250')]: {
+          position: "relative",
+          fontSize: "12px",
+          left: "-1.2vw"
+      },
+      [theme.breakpoints.up('1350')]: {
+          left: "-0.2vw",
+      },
+      [theme.breakpoints.up('1400')]: {
+          left: "0vw",
+      },
+      '&:hover': {
+          color: "white",
+          transform: "scale(1.08)",
+      }
+  },
+  buttonChartIcon: {
+      [theme.breakpoints.up('1200')]:{
+          fontSize: "12px"
+      }
   }
 }));
 
@@ -223,6 +267,137 @@ const LeftLayout = ({ classes }) => {
                 <Image src="./img/DaWeather.png" className={classes.imageTop} fluid/>
             </div>
             <div className={classes.cardContainer}>
+                <Row spacing={3}>
+                    <Col sm={6} md={12} lg={6} className={classes.item}>
+                        <Paper className={classes.paper} style={{background:backgroundColor}}>
+                            <p className={classes.headerText}><LocationMarker size="40"/> {cityLocation}</p>
+                        </Paper>
+                    </Col>
+                    <Col sm={6} md={12} lg={6} className={classes.item}>
+                        <Paper className={classes.paper} style={{background:backgroundColor}}>
+                            <p className={classes.headerText}><Calendar size="40"/> {currentDate}</p>
+                        </Paper>
+                    </Col>
+                    <Col sm={6} md={12} lg={6}  className={classes.item}>
+                        <Paper className={classes.paper} style={{background:backgroundColor}}>
+                            <Image src={icon} className={classes.iconWeather} fluid/>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitle}>{data.Temperatura}°C</Card.Title>
+                                <div className={classes.relativeTContainer}>
+                                    <Card.Text className={classes.relativeT}>
+                                        Sensación térmica: {data.TemperaturaRel}°C
+                                    </Card.Text>
+                                </div>
+                            </Card.Body>
+                        </Paper>
+                    </Col>
+                    <Col sm={6} md={12} lg={6} className={classes.item}>
+                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
+                            <Image src="./img/iconsWeather/generic.png" className={classes.iconWeather} fluid/>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitle}>{data.SpecialSensorReading}</Card.Title>
+                                <div className={classes.relativeTContainer}>
+                                    <Card.Text className={classes.relativeT}>
+                                        ID Estación: {data.SensorID} | Sensor: {data.SpecialSensorTitle}
+                                    </Card.Text>
+                                </div>
+                            </Card.Body>
+                        </Paper>
+                    </Col>
+                    <Col xs={6} xl={3}  className={classes.item}>
+                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitleMini}>Humedad</Card.Title>
+                                <Card.Text>
+                                    {data.Humedad}%
+                                </Card.Text>
+                            </Card.Body>
+                        </Paper>
+                    </Col>
+                    <Col xs={6} xl={3} className={classes.item}>
+                        <Paper className={classes.paper}>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitleMini}>Luz</Card.Title>
+                                <Card.Text>
+                                    {data.Luz} lumens
+                                </Card.Text>
+                            </Card.Body>
+                        </Paper>
+                    </Col>
+                    <Col xs={6} xl={3} className={classes.item}>
+                        <Paper className={classes.paper} style={{backgroundColor:{backgroundColor}}}>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitleMini}>Sonido</Card.Title>
+                                <Card.Text>
+                                    {data.Sonido} db
+                                </Card.Text>
+                            </Card.Body>
+                        </Paper>
+                    </Col>
+                    <Col xs={6} xl={3} className={classes.item}>
+                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitleMini}>Temperatura</Card.Title>
+                                <Card.Text>
+                                    {data.Temperatura} °C
+                                </Card.Text>
+                            </Card.Body>
+                        </Paper>
+                    </Col>
+                    <Col xs={6} xl={3} className={classes.item}>
+                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitleMini}>CO2</Card.Title>
+                                <Card.Text>
+                                    {data.Concentracion} mg/L
+                                </Card.Text>
+                            </Card.Body>
+                        </Paper>
+                    </Col>
+                    <Col xs={6} xl={3} className={classes.item}>
+                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitleMini}>Lluvia</Card.Title>
+                                <Card.Text>
+                                    {data.Lluvia}
+                                </Card.Text>
+                            </Card.Body>
+                        </Paper>
+                    </Col>
+                    <Col sm={6} xl={3} className={classes.item}>
+                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitleMini}>Viento</Card.Title>
+                                <Card.Text>
+                                    {data.Velocidad}
+                                </Card.Text>
+                            </Card.Body>
+                        </Paper>
+                    </Col>
+                    <Col sm={6} xl={3} className={classes.item}>
+                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
+                            <Card.Body className={classes.cardBody}>
+                                <Card.Title className={classes.cardTitleMini}>Gráficas</Card.Title>   
+                                <Card.Text>
+                                    <Button
+                                        className={classes.buttonChart}
+                                        component={Link} to="/historico"
+                                        variant="contained"
+                                        color="primary"
+                                        startIcon={<TimelineIcon className={classes.buttonChartIcon}/>}
+                                    >
+                                    Acceder
+                                    </Button>
+                                </Card.Text>
+                            </Card.Body>
+                        </Paper>
+                    </Col>
+                </Row>
+            </div>
+            {/* <div className={classes.imageTopContainer}>
+                <Image src="./img/DaWeather.png" className={classes.imageTop} fluid/>
+            </div>
+            <div className={classes.cardContainer}>
                 <Grid container spacing={3}>
                     <Grid item xs={6}>
                         <Paper className={classes.paper} style={{background:backgroundColor}}>
@@ -349,7 +524,7 @@ const LeftLayout = ({ classes }) => {
                         </Paper>
                     </Grid>
                 </Grid>
-            </div>
+            </div> */}
         </div>
   );
 };
