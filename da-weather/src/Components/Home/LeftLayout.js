@@ -65,10 +65,6 @@ const useStyles = makeStyles((theme) => ({
   },
   item: {
     padding: "1rem",
-    transition: "transform 450ms",
-    '&:hover': {
-        transform: "scale(1.02)"
-    }
   },
   cardContainer:{
       padding:"1rem"
@@ -146,6 +142,7 @@ const LeftLayout = ({ classes }) => {
   //const data = useData();
   
   const [data,setData] = useState({});
+  const [data2,setData2] = useState({});
   const [icon,setIcon] = useState("./img/iconsWeather/MostlySunny.png");
   const [background,setBackground] = useState("./img/background/Good.jpg");
   const [cityLocation, setCityLocation] = useState("MTY");
@@ -238,15 +235,23 @@ const LeftLayout = ({ classes }) => {
     //console.log(data.SensorID);
 },[ID,backgroundColor]);  
 
-    async function fetchLocation(){
-        if(dataStatus){
-            //console.log(data.SensorID);
-            const newRequest = await axios.get("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + data.Latitude +  "," + data.Longitude + "&key=" + process.env.REACT_APP_APIKEY_GEOCODING);
+useEffect(() => {
+    const query = firebase.database().ref("Nodes").once('value').then(function(snapshot){
+        var datas = snapshot.child(ID).val();
+        async function fetchLocation(){
+            console.log("request");
+            const newRequest = await axios.get("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + datas.GPS.Latitude +  "," + datas.GPS.Longitude + "&key=" + process.env.REACT_APP_APIKEY_GEOCODING);
             setCityLocation(newRequest.data.results[4].formatted_address);
         }
-    }
+
+        if(datas){
+            fetchLocation();
+        }
+    })
+},[ID]);
+
+
     
-    //fetchLocation();
 
 
   //Temporal
@@ -394,137 +399,6 @@ const LeftLayout = ({ classes }) => {
                     </Col>
                 </Row>
             </div>
-            {/* <div className={classes.imageTopContainer}>
-                <Image src="./img/DaWeather.png" className={classes.imageTop} fluid/>
-            </div>
-            <div className={classes.cardContainer}>
-                <Grid container spacing={3}>
-                    <Grid item xs={6}>
-                        <Paper className={classes.paper} style={{background:backgroundColor}}>
-                            <p className={classes.headerText}><LocationMarker size="40"/> {cityLocation}</p>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Paper className={classes.paper} style={{background:backgroundColor}}>
-                            <p className={classes.headerText}><Calendar size="40"/> {currentDate}</p>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Paper className={classes.paper} style={{background:backgroundColor}}>
-                            <Image src={icon} className={classes.iconWeather} fluid/>
-                            <Card.Body className={classes.cardBody}>
-                                <Card.Title className={classes.cardTitle}>{data.Temperatura}°C</Card.Title>
-                                <div className={classes.relativeTContainer}>
-                                    <Card.Text className={classes.relativeT}>
-                                        Sensación térmica: {data.TemperaturaRel}°C
-                                    </Card.Text>
-                                </div>
-                            </Card.Body>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
-                            <Image src="./img/iconsWeather/generic.png" className={classes.iconWeather} fluid/>
-                            <Card.Body className={classes.cardBody}>
-                                <Card.Title className={classes.cardTitle}>{data.SpecialSensorReading}</Card.Title>
-                                <div className={classes.relativeTContainer}>
-                                    <Card.Text className={classes.relativeT}>
-                                        ID Estación: {data.SensorID} | Sensor: {data.SpecialSensorTitle}
-                                    </Card.Text>
-                                </div>
-                            </Card.Body>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={3}>
-                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
-                            <Card.Body className={classes.cardBody}>
-                                <Card.Title className={classes.cardTitleMini}>Humedad</Card.Title>
-                                <Card.Text>
-                                    {data.Humedad}%
-                                </Card.Text>
-                            </Card.Body>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={3}>
-                        <Paper className={classes.paper}>
-                            <Card.Body className={classes.cardBody}>
-                                <Card.Title className={classes.cardTitleMini}>Luz</Card.Title>
-                                <Card.Text>
-                                    {data.Luz} lumens
-                                </Card.Text>
-                            </Card.Body>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={3}>
-                        <Paper className={classes.paper} style={{backgroundColor:{backgroundColor}}}>
-                            <Card.Body className={classes.cardBody}>
-                                <Card.Title className={classes.cardTitleMini}>Sonido</Card.Title>
-                                <Card.Text>
-                                    {data.Sonido} db
-                                </Card.Text>
-                            </Card.Body>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={3}>
-                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
-                            <Card.Body className={classes.cardBody}>
-                                <Card.Title className={classes.cardTitleMini}>Temperatura</Card.Title>
-                                <Card.Text>
-                                    {data.Temperatura} °C
-                                </Card.Text>
-                            </Card.Body>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={3}>
-                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
-                            <Card.Body className={classes.cardBody}>
-                                <Card.Title className={classes.cardTitleMini}>CO2</Card.Title>
-                                <Card.Text>
-                                    {data.Concentracion} mg/L
-                                </Card.Text>
-                            </Card.Body>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={3}>
-                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
-                            <Card.Body className={classes.cardBody}>
-                                <Card.Title className={classes.cardTitleMini}>Lluvia</Card.Title>
-                                <Card.Text>
-                                    {data.Lluvia}
-                                </Card.Text>
-                            </Card.Body>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={3}>
-                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
-                            <Card.Body className={classes.cardBody}>
-                                <Card.Title className={classes.cardTitleMini}>Viento</Card.Title>
-                                <Card.Text>
-                                    {data.Velocidad}
-                                </Card.Text>
-                            </Card.Body>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={3}>
-                        <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
-                            <Card.Body className={classes.cardBody}>
-                                <Card.Title className={classes.cardTitleMini}>Gráficas</Card.Title>   
-                                <Card.Text>
-                                    <Button
-                                        className={classes.buttonChart}
-                                        component={Link} to="/historico"
-                                        variant="contained"
-                                        color="primary"
-                                        startIcon={<TimelineIcon/>}
-                                    >
-                                    Acceder
-                                    </Button>
-                                </Card.Text>
-                            </Card.Body>
-                        </Paper>
-                    </Grid>
-                </Grid>
-            </div> */}
         </div>
   );
 };
