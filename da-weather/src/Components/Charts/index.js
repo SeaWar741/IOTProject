@@ -126,8 +126,11 @@ const useStyles = makeStyles((theme) => ({
     backgroundImage:"url('./img/background/charts.jpg')",
     backgroundRepeat:"no-repeat",
     backgroundPosition:"center",
+<<<<<<< HEAD
     backgroundSize: "cover",
     paddingBottom: "100px",
+=======
+>>>>>>> ab10f1b89f5db44a15e4102560185ea20fcbe4f0
   },
   imageTopContainer:{
     display: "block",
