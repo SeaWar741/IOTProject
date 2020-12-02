@@ -91,13 +91,13 @@ supervised = timeseries_to_supervised(diff_values, 1)
 supervised_values = supervised.values
 
 # split data into train and test-sets
-train, test = supervised_values[0:22623], supervised_values[22623:]
+train, test = supervised_values[0:7660], supervised_values[7661:]
 
 # transform the scale of the data
 scaler, train_scaled, test_scaled = scale(train, test)
 
 # fit the model
-lstm_model = fit_lstm(train_scaled, 1, 200, 4)
+lstm_model = fit_lstm(train_scaled, 1, 20, 4)
 # forecast the entire training dataset to build up state for forecasting
 train_reshaped = train_scaled[:, 0].reshape(len(train_scaled), 1, 1)
 lstm_model.predict(train_reshaped, batch_size=1)
@@ -117,8 +117,10 @@ for i in range(len(test_scaled)):
 	expected = raw_values[len(train) + i + 1]
 	print('Month=%d, Predicted=%f, Expected=%f' % (i+1, yhat, expected))
 
+lstm_model.save('my_model2.h5')
+
 # report performance
-rmse = sqrt(mean_squared_error(raw_values[-12:], predictions))
+rmse = sqrt(mean_squared_error(raw_values[7661:], predictions))
 print('Test RMSE: %.3f' % rmse)
 # line plot of observed vs predicted
 pyplot.plot(raw_values[-12:])
