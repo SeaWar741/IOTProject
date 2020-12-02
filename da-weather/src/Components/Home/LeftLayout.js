@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundPosition:"center",
 
     width: "100%",
-    minHeight: "100vh",
+    minHeight: "110vh",
     color: "white",
     paddingTop: "20px",
     paddingBottom: "20px"

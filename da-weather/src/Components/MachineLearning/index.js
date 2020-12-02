@@ -1,196 +1,208 @@
-import React, { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import {Container,Row,Col } from 'react-bootstrap'
-import * as tf from '@tensorflow/tfjs';
-import {
-    TextField,
-    Grid,
-    AppBar,
-    Toolbar,
-    Typography,
-    IconButton,
-    Button
-  
-  
-  } from '@material-ui/core'
-  import MenuIcon from '@material-ui/icons/Menu';
-  import { blue } from '@material-ui/core/colors';
-  import padSequences from './paddedSeq'
+///https://firebasestorage.googleapis.com/v0/b/iotproject-446e7.appspot.com/o/my_model2.h5?alt=media&token=68ff47b0-ea2d-4c01-9536-8f25d12e4dbf
+
+import React, { useEffect, useState, useRef } from "react";
+
+import { makeStyles, useTheme  } from "@material-ui/core/styles";
+import {Container, Row, Col, Image } from 'react-bootstrap'
 
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useDataLayerValue } from '../../DataLayer';
+
+import { Link } from 'react-router-dom';
+
+import SaveIcon from '@material-ui/icons/Save';
+import Button from '@material-ui/core/Button';
+
+
+import "react-datepicker/dist/react-datepicker.css";
 
 
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
+  Main: {
+    backgroundColor: "#F5F4F8",
+    color: "black",
+    minHeight: "100vh",
+    backgroundImage:"url('./img/background/ai.jpg')",
+    backgroundRepeat:"no-repeat",
+    backgroundPosition:"center",
+    backgroundSize: "cover",
+    paddingBottom: "100px",
   },
-  paper: {
-    height: 140,
-    width: 100,
+  imageTopContainer:{
+    display: "block",
+    marginLeft: "auto",
+    marginRight: "auto",
+    textAlign:"center",
+    paddingTop: "20px"
   },
-  control: {
-    padding: theme.spacing(2),
+  imageTop:{
+    maxHeight: "80px",
+    marginBottom: "50px"
   },
-  column:{
-    paddingRight:"0 !important",
-    paddingLeft:"0 !important"
+  chartContainer: {
+    paddingBottom: "50px",
+    textAlign:"center",
+    display: 'flex'
+    
+  },
+  chartContainer2: {
+    paddingBottom: "50px",
+    textAlign:"center",
+    
+  },
+  chartDiv:{
+    backgroundColor:"#ECE8EC",
+    borderRadius:"10px",
+    boxShadow: "0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)",
+    transition: "0.5s"
+  },
+  chartTitle: {
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: "30px",
+    color: "black",
+    paddingTop:"10px"
+  },
+  noData: {
+    color: "black"
+  },
+  bottom: {
+    color: theme.palette.grey[theme.palette.type === 'light' ? 200 : 700],
+  },
+  top: {
+    color: '#1a90ff',
+    animationDuration: '550ms',
+    position: 'absolute',
+    left: 0,
+  },
+  circle: {
+    strokeLinecap: 'round',
+  },
+  dateDiv:{
+    backgroundColor:"#ECE8EC",
+    borderRadius:"10px",
+    boxShadow: "0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)",
+    transition: "0.5s",
+    width:"215px",
+    margin: "0 0 0 auto"
+  },
+  dateContainer:{
+      padding:"10px",
+  },
+  dateContainerUpper:{
+      paddingLeft:"1rem",
+      paddingBottom:"2rem"
+  },
+  table: {
+    minWidth: 500,
+  },
+  tableContainer:{
+      paddingBottom:"2rem"
+  },
+  buttonD:{
+      padding:"2rem",
+  },
+  bodyData:{
+      padding:"2rem",
+      textAlign: "justify",
+      textJustify: "inter-word"
+  },
+  imageD:{
+    width: "100%",
+    height: "auto"
   }
 }));
 
+
+
 const MachineLearning = ({ classes }) => {
-    classes = useStyles();
-    const url = {
+  const [{ID}] = useDataLayerValue();
+  //Charts data
+  classes = useStyles();
 
-        model: 'https://storage.googleapis.com/tfjs-models/tfjs/sentiment_cnn_v1/model.json',
-        metadata: 'https://storage.googleapis.com/tfjs-models/tfjs/sentiment_cnn_v1/metadata.json'
-    };
-    
-    const OOV_INDEX = 2;
-    
-    const [metadata, setMetadata] = useState();
-    const [model, setModel] = useState();
-    const [testText, setText] = useState("");
-    const [testScore, setScore] = useState("");
-    const [trimedText, setTrim] = useState("")
-    const [seqText, setSeq] = useState("")
-    const [padText, setPad] = useState("")
-    const [inputText, setInput] = useState("")
-    
-    
-    async function loadModel(url) {
-      try {
-        const model = await tf.loadLayersModel(url.model);
-        setModel(model);
-      } catch (err) {
-        console.log(err);
-      }
+  const openInNewTab = (url) => {
+        const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
+        if (newWindow) newWindow.opener = null
     }
-    
-    async function loadMetadata(url) {
-      try {
-        const metadataJson = await fetch(url.metadata);
-        const metadata = await metadataJson.json();
-        setMetadata(metadata);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-    
-    
-    const getSentimentScore =(text) => {
-      console.log(text)
-      const inputText = text.trim().toLowerCase().replace(/(\.|\,|\!)/g, '').split(' ');
-      setTrim(inputText)
-      console.log(inputText)
-      const sequence = inputText.map(word => {
-        let wordIndex = metadata.word_index[word] + metadata.index_from;
-        if (wordIndex > metadata.vocabulary_size) {
-          wordIndex = OOV_INDEX;
-        }
-        return wordIndex;
-      });
-      setSeq(sequence)
-      console.log(sequence)
-      // Perform truncation and padding.
-      const paddedSequence = padSequences([sequence], metadata.max_len);
-      console.log(metadata.max_len)
-      setPad(paddedSequence)
-    
-      const input = tf.tensor2d(paddedSequence, [1, metadata.max_len]);
-      console.log(input)
-      setInput(input)
-      const predictOut = model.predict(input);
-      const score = predictOut.dataSync()[0];
-      predictOut.dispose();
-      setScore(score)  
-      return score;
-    }
-    
-    
-    useEffect(()=>{
-      tf.ready().then(
-        ()=>{
-          loadModel(url)
-          loadMetadata(url)
-        }
-      );
-    
-    },[])
 
-    return (
-        <>
-            <AppBar position="static">
-                <Toolbar>
-                <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-                    <MenuIcon />
-                </IconButton>
-                <Typography variant="h6" className={classes.title}>
-                    TensorflowJS Test
-                </Typography>
-                </Toolbar>
-            </AppBar>
-            <Grid container style={{ height:"90vh", padding:20}}>
-            <Grid item lg={6} xs={12} style={{display:"flex",alignItems:"center", flexDirection:"column"}}>
-            <TextField
-                id="standard-read-only-input"
-                label="Type your sentences here"
-                onChange={(e)=> setText(e.target.value)}
-                defaultValue=""
-                value={testText}
-                multiline
-                rows={4}
-                variant="outlined"
-                />
-                <br/>
-                <br/>
-                {testText !== "" ?
-                    <Button style={{width:"20vh", height:"5vh"}} variant= "outlined" onClick={()=>getSentimentScore(testText)}>Calculate</Button>
-            : <></>}
+  return (
+    <div className={classes.Main}>
+      <div className={classes.imageTopContainer}>
+          <Link
+            to="/"
+          >
+            <Image src="./img/DaWeather.png" className={classes.imageTop} fluid/>
+          </Link>
+      </div>
+      <Container>
+      <Row>
+            <Col sm className={classes.chartContainer}>
+                <div className={classes.chartDiv}>
+                    <h2 className={classes.chartTitle}>Información</h2>
+                    <div className={classes.bodyData}>
+                        <p>
+                            Este modelo es una red neuronal LSTM.
+                            Utiliza una arquitectura de red neuronal artificial recurrente utilizada en el campo del aprendizaje profundo. A diferencia de las redes neuronales de alimentación directa estándar, LSTM tiene conexiones de retroalimentación.
+                        </p>
+                        <p>
+                            El modelo creado cuenta con 1 capa densa con 4 neuronas, utilizando
+                            como optimizador adam. El modelo se entrenó con 20 epochs de batch size 1.
+                            Utilizando un dataset de temperatura en Monterrey desde 1929. El proceso
+                            de entrenamiento fue de 60/40. Los resultados obtenidos dieron un error de mas menos 2 grados celcius
+                        </p>
+                        <p>
+                            El modelo se entrenó por 2 horas hasta lograr un loss de 0.0318.
+                            Evaluando el modelo ya entrenado se encontraron resultados satisfactorios permitiendo
+                            crear un sistema capaz de predecir el clima de manera automática.
+                        </p>
+                        <p>
+                            <strong>Requerimientos: </strong>
+                            Tensorflow, sklearn, pandas, numpy, keras. 
+                            <br/>Min. GPU Nvidia GTX 1060 6GB y 16 GB RAM
+                        </p>
+                    </div>
+                </div>
+            </Col>
+            <Col sm className={classes.chartContainer}>
+                <div className={classes.chartDiv}>
+                    <h2 className={classes.chartTitle}>Resultados</h2>
+                    <div className={classes.bodyData}>
+                        <Container>
+                            <img src={"./img/ChartML.png"} className={classes.imageD}/>
+                            Gráfica generada a partir del modelo probando contra datos históricos reales
+                        </Container>
+                        <br/>
+                            <strong>AZUL: </strong>Real
+                            <br/>
+                            <strong>Naranja: </strong>Predicción
+                    </div>
+                </div>
+            </Col>
+      </Row>
+       <Row>
+            <Col sm className={classes.chartContainer2}>
+                <div className={classes.chartDiv}>
+                    <h2 className={classes.chartTitle}>Descargar modelo</h2>
+                    <div className={classes.buttonD}>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            size="large"
+                            className={classes.button}
+                            startIcon={<SaveIcon />}
+                            onClick={() => {openInNewTab('https://firebasestorage.googleapis.com/v0/b/iotproject-446e7.appspot.com/o/my_model2.h5?alt=media&token=68ff47b0-ea2d-4c01-9536-8f25d12e4dbf')}}
+                        >
+                            Download
+                        </Button>
+                    </div>
+                </div>
+            </Col>
+      </Row>
+    </Container>
 
-            </Grid>
-            <Grid item lg={6} xs ={12} style={{display:"flex", alignItems:"center", flexDirection:'column'}}>
-            <br/>
-            <Typography>Whats going on:</Typography>
-            <br/>
-            {testScore !==""?
-            <>
-            <Typography style={{color:"blue"}} variant="h5">{testScore}</Typography> 
-            <br/>
-            <Typography>1 = Positive, 0 = Negative</Typography>
-            <br/>
-            <Typography>Trimmed the input text:</Typography>
-            <br/>
-            <Typography  style={{color:"green"}}> {trimedText.toString()}</Typography>
-            <br/>
-            <Typography>Map vocab to words: </Typography>
-            <br/>
-            <Typography  style={{color:"green"}}> {seqText.toString()}</Typography>
-            <br/>
-            <Typography>Fix the length:</Typography>
-            <br/>
-            <Typography style={{color:"green",wordWrap: "break-word", width:"80%" }}>{padText.toString()}</Typography>
-            <br/>
-            <Typography>Input to tf:</Typography>
-            <br/>
-            <Typography style={{color:"green",wordWrap: "break-word", width:"80%" }}>{inputText.toString()}</Typography>
-            <br/>
-            <a href={url.model}>Model Link</a>
-            <a href={url.metadata}>Model Metadata</a>
-
-            <br/>
-
-            </>
-
-
-            :<></>}
-            
-
-            </Grid>
-        </Grid>
-
-     </>
-    );
+    </div>
+  );
 };
 
 export default MachineLearning;

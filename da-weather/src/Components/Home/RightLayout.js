@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
   Main:{
     backgroundColor:"#E3E5E3",
     width:"100%",
-    minHeight:"100vh",
+    minHeight:"110vh",
     color:"white"
   },
   imageMarker:{
@@ -110,7 +110,7 @@ const RightLayout = ({ classes }) => {
   return (
     <div className={classes.Main}>
         <MapGL
-            style={{ width: '100%', minHeight: '100vh' }}
+            style={{ width: '100%', height: '110vh' }}
             mapStyle={themeMap}
             accessToken= {process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
             latitude={viewport.latitude}

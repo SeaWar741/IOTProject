@@ -25,6 +25,7 @@ import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
+import Button from '@material-ui/core/Button';
 
 import TableEnd from "./table"
 
@@ -147,7 +148,8 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor:"#ECE8EC",
     borderRadius:"10px",
     boxShadow: "0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)",
-    transition: "0.5s"
+    transition: "0.5s",
+    textAlign:"center"
   },
   chartTitle: {
     textAlign: "center",
@@ -191,6 +193,21 @@ const useStyles = makeStyles((theme) => ({
   },
   tableContainer:{
       paddingBottom:"2rem"
+  },
+  buttonD:{
+    padding:"2rem",
+  },
+  bodyData:{
+      padding:"2rem",
+      textAlign: "center",
+      textJustify: "inter-word"
+  },
+  imageD:{
+    width: "100%",
+    height: "auto"
+  },
+  finalRow:{
+    paddingBottom:"2rem"
   }
 }));
 
@@ -720,6 +737,25 @@ const Charts = ({ classes }) => {
             </div>
           </Col>
         )}
+      </Row>
+      <Row className={classes.finalRow}>
+            <Col sm className={classes.chartContainer2}>
+                <div className={classes.chartDiv}>
+                    <h2 className={classes.chartTitle}>Modelo Machine Learning</h2>
+                    <div className={classes.buttonD}>
+                      <Link to="/machine-learning">
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            size="large"
+                            className={classes.button}
+                        >
+                            Explorar
+                        </Button>
+                      </Link> 
+                    </div>
+                </div>
+            </Col>
       </Row>
     </Container>
     <Container className={classes.tableContainer}>
