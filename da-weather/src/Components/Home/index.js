@@ -31,10 +31,10 @@ const Home = ({ classes }) => {
     <div className={classes.Main}>
       <Container fluid>
         <Row>
-          <Col sm={7} className={classes.column}>
+          <Col md={7} className={classes.column}>
             <LeftLayout/>
           </Col>
-          <Col sm={5} className={classes.column}>
+          <Col md={5} className={classes.column}>
             <RightLayout/>
           </Col>
         </Row>

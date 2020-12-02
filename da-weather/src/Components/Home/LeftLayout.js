@@ -1,6 +1,6 @@
 import React, { useEffect, useState} from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import {Image,Card } from 'react-bootstrap';
+import {Image,Card, Row, Col } from 'react-bootstrap';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import {LocationMarker} from '@styled-icons/heroicons-solid/LocationMarker';
@@ -23,10 +23,11 @@ const useStyles = makeStyles((theme) => ({
     backgroundRepeat:"no-repeat",
     backgroundPosition:"center",
 
-    width:"100%",
-    minHeight:"100vh",
-    maxHeight:"100vh",
-    color:"white"
+    width: "100%",
+    minHeight: "100vh",
+    color: "white",
+    paddingTop: "20px",
+    paddingBottom: "20px"
   },
   imageTopContainer:{
     display: "block",
@@ -38,7 +39,10 @@ const useStyles = makeStyles((theme) => ({
     maxHeight:"80px",
   },
   iconWeather:{
-    minHeight:"110px"
+    minHeight:"110px",
+    [theme.breakpoints.down('576')]: {
+        minHeight: "70px"
+    }
   },
   paper: {
     padding: theme.spacing(2),
@@ -59,6 +63,9 @@ const useStyles = makeStyles((theme) => ({
     /* important */
     minHeight: "100%"
   },
+  item: {
+    padding: "1rem",
+  },
   cardContainer:{
       padding:"1rem"
   },
@@ -66,8 +73,11 @@ const useStyles = makeStyles((theme) => ({
       paddingTop:"1rem",
   },
   cardTitle:{
-      fontWeight:"600",
-      fontSize:"4rem !important"
+      fontWeight: "600",
+      fontSize: "4rem !important",
+      [theme.breakpoints.down('576')]: {
+          fontSize: "3rem !important"
+      }
   },
   cardTitleMini:{
     fontWeight:"600",
@@ -82,6 +92,9 @@ const useStyles = makeStyles((theme) => ({
       fontWeight:"500",
       paddingTop:"10px",
       paddingBottom:"10px",
+      [theme.breakpoints.down('576')]: {
+          fontSize: "12px"
+      }
   },
   headerText:{
       fontWeight:"bold",
@@ -89,6 +102,33 @@ const useStyles = makeStyles((theme) => ({
   },
   buttonChart:{
       backgroundColor:"#0074A1 !important",
+      borderRadius: "15px",
+      transition: "transform 450ms",
+      [theme.breakpoints.up('1200')]: {
+          position: "relative",
+          fontSize: "12px",
+          left: "-1.8vw"
+      },
+      [theme.breakpoints.up('1250')]: {
+          position: "relative",
+          fontSize: "12px",
+          left: "-1.2vw"
+      },
+      [theme.breakpoints.up('1350')]: {
+          left: "-0.2vw",
+      },
+      [theme.breakpoints.up('1400')]: {
+          left: "0vw",
+      },
+      '&:hover': {
+          color: "white",
+          transform: "scale(1.08)",
+      }
+  },
+  buttonChartIcon: {
+      [theme.breakpoints.up('1200')]:{
+          fontSize: "12px"
+      }
   }
 }));
 
@@ -102,6 +142,7 @@ const LeftLayout = ({ classes }) => {
   //const data = useData();
   
   const [data,setData] = useState({});
+  const [data2,setData2] = useState({});
   const [icon,setIcon] = useState("./img/iconsWeather/MostlySunny.png");
   const [background,setBackground] = useState("./img/background/Good.jpg");
   const [cityLocation, setCityLocation] = useState("MTY");
@@ -194,15 +235,23 @@ const LeftLayout = ({ classes }) => {
     //console.log(data.SensorID);
 },[ID,backgroundColor]);  
 
-    async function fetchLocation(){
-        if(dataStatus){
-            //console.log(data.SensorID);
-            const newRequest = await axios.get("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + data.Latitude +  "," + data.Longitude + "&key=" + process.env.REACT_APP_APIKEY_GEOCODING);
+useEffect(() => {
+    const query = firebase.database().ref("Nodes").once('value').then(function(snapshot){
+        var datas = snapshot.child(ID).val();
+        async function fetchLocation(){
+            console.log("request");
+            const newRequest = await axios.get("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + datas.GPS.Latitude +  "," + datas.GPS.Longitude + "&key=" + process.env.REACT_APP_APIKEY_GEOCODING);
             setCityLocation(newRequest.data.results[4].formatted_address);
         }
-    }
+
+        if(datas){
+            fetchLocation();
+        }
+    })
+},[ID]);
+
+
     
-    //fetchLocation();
 
 
   //Temporal
@@ -223,18 +272,18 @@ const LeftLayout = ({ classes }) => {
                 <Image src="./img/DaWeather.png" className={classes.imageTop} fluid/>
             </div>
             <div className={classes.cardContainer}>
-                <Grid container spacing={3}>
-                    <Grid item xs={6}>
+                <Row spacing={3}>
+                    <Col sm={6} md={12} lg={6} className={classes.item}>
                         <Paper className={classes.paper} style={{background:backgroundColor}}>
                             <p className={classes.headerText}><LocationMarker size="40"/> {cityLocation}</p>
                         </Paper>
-                    </Grid>
-                    <Grid item xs={6}>
+                    </Col>
+                    <Col sm={6} md={12} lg={6} className={classes.item}>
                         <Paper className={classes.paper} style={{background:backgroundColor}}>
                             <p className={classes.headerText}><Calendar size="40"/> {currentDate}</p>
                         </Paper>
-                    </Grid>
-                    <Grid item xs={6}>
+                    </Col>
+                    <Col sm={6} md={12} lg={6}  className={classes.item}>
                         <Paper className={classes.paper} style={{background:backgroundColor}}>
                             <Image src={icon} className={classes.iconWeather} fluid/>
                             <Card.Body className={classes.cardBody}>
@@ -246,8 +295,8 @@ const LeftLayout = ({ classes }) => {
                                 </div>
                             </Card.Body>
                         </Paper>
-                    </Grid>
-                    <Grid item xs={6}>
+                    </Col>
+                    <Col sm={6} md={12} lg={6} className={classes.item}>
                         <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
                             <Image src="./img/iconsWeather/generic.png" className={classes.iconWeather} fluid/>
                             <Card.Body className={classes.cardBody}>
@@ -259,8 +308,8 @@ const LeftLayout = ({ classes }) => {
                                 </div>
                             </Card.Body>
                         </Paper>
-                    </Grid>
-                    <Grid item xs={3}>
+                    </Col>
+                    <Col xs={6} xl={3}  className={classes.item}>
                         <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Humedad</Card.Title>
@@ -269,8 +318,8 @@ const LeftLayout = ({ classes }) => {
                                 </Card.Text>
                             </Card.Body>
                         </Paper>
-                    </Grid>
-                    <Grid item xs={3}>
+                    </Col>
+                    <Col xs={6} xl={3} className={classes.item}>
                         <Paper className={classes.paper}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Luz</Card.Title>
@@ -279,8 +328,8 @@ const LeftLayout = ({ classes }) => {
                                 </Card.Text>
                             </Card.Body>
                         </Paper>
-                    </Grid>
-                    <Grid item xs={3}>
+                    </Col>
+                    <Col xs={6} xl={3} className={classes.item}>
                         <Paper className={classes.paper} style={{backgroundColor:{backgroundColor}}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Sonido</Card.Title>
@@ -289,8 +338,8 @@ const LeftLayout = ({ classes }) => {
                                 </Card.Text>
                             </Card.Body>
                         </Paper>
-                    </Grid>
-                    <Grid item xs={3}>
+                    </Col>
+                    <Col xs={6} xl={3} className={classes.item}>
                         <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Temperatura</Card.Title>
@@ -299,8 +348,8 @@ const LeftLayout = ({ classes }) => {
                                 </Card.Text>
                             </Card.Body>
                         </Paper>
-                    </Grid>
-                    <Grid item xs={3}>
+                    </Col>
+                    <Col xs={6} xl={3} className={classes.item}>
                         <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>CO2</Card.Title>
@@ -309,8 +358,8 @@ const LeftLayout = ({ classes }) => {
                                 </Card.Text>
                             </Card.Body>
                         </Paper>
-                    </Grid>
-                    <Grid item xs={3}>
+                    </Col>
+                    <Col xs={6} xl={3} className={classes.item}>
                         <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Lluvia</Card.Title>
@@ -319,8 +368,8 @@ const LeftLayout = ({ classes }) => {
                                 </Card.Text>
                             </Card.Body>
                         </Paper>
-                    </Grid>
-                    <Grid item xs={3}>
+                    </Col>
+                    <Col sm={6} xl={3} className={classes.item}>
                         <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Viento</Card.Title>
@@ -329,8 +378,8 @@ const LeftLayout = ({ classes }) => {
                                 </Card.Text>
                             </Card.Body>
                         </Paper>
-                    </Grid>
-                    <Grid item xs={3}>
+                    </Col>
+                    <Col sm={6} xl={3} className={classes.item}>
                         <Paper className={classes.paper} style={{backgroundColor:backgroundColor}}>
                             <Card.Body className={classes.cardBody}>
                                 <Card.Title className={classes.cardTitleMini}>Gráficas</Card.Title>   
@@ -340,15 +389,15 @@ const LeftLayout = ({ classes }) => {
                                         component={Link} to="/historico"
                                         variant="contained"
                                         color="primary"
-                                        startIcon={<TimelineIcon/>}
+                                        startIcon={<TimelineIcon className={classes.buttonChartIcon}/>}
                                     >
                                     Acceder
                                     </Button>
                                 </Card.Text>
                             </Card.Body>
                         </Paper>
-                    </Grid>
-                </Grid>
+                    </Col>
+                </Row>
             </div>
         </div>
   );
