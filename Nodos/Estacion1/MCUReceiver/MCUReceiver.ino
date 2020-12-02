@@ -9,8 +9,15 @@
 #include <WiFiUdp.h>
 
 ESP8266WebServer server;
-char* ssid = "iPhone abraham";
-char* password = "12345677";
+char* ssid = "Note 10+ Juan Carlos";
+char* password = "Juan2000";
+
+//Time from NTP Server
+const long utcOffsetInSeconds = 3600;
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds);
+int minutes;
+int timePassed;
 
 //Time from NTP Server
 const long utcOffsetInSeconds = 3600;
