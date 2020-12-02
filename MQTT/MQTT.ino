@@ -1,4 +1,3 @@
-
 // Este código funciona con la siguiente configuración:
 //    Board support API esp8266 (by ESP8266 Community) version 2.5.2
 

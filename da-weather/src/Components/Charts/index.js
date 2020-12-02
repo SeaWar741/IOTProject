@@ -128,8 +128,11 @@ const useStyles = makeStyles((theme) => ({
     backgroundPosition:"center",
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     backgroundSize: "cover",
     paddingBottom: "100px",
+=======
+>>>>>>> ab10f1b89f5db44a15e4102560185ea20fcbe4f0
 =======
 >>>>>>> ab10f1b89f5db44a15e4102560185ea20fcbe4f0
 =======
